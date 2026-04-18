@@ -1,0 +1,2174 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A 10-Day UK Summer Route</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Nunito+Sans:wght@400;650;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    :root {
+      --ink: #17201b;
+      --muted: #56635c;
+      --paper: #fbfbf7;
+      --line: #d8ddd6;
+      --pine: #1f5d4a;
+      --moss: #8aa03d;
+      --sea: #337f9e;
+      --rose: #b94d67;
+      --gold: #c48927;
+      --panel: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      overflow-x: hidden;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+      font-family: "Nunito Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.65;
+    }
+
+    a {
+      color: var(--pine);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 78vh;
+      width: 100%;
+      display: grid;
+      align-items: end;
+      padding: 40px clamp(18px, 4vw, 56px);
+      color: white;
+      background: #14231d;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(180deg, rgba(8, 18, 15, 0.02), rgba(8, 18, 15, 0.54)),
+        linear-gradient(90deg, rgba(8, 18, 15, 0.48), rgba(8, 18, 15, 0.08) 62%);
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-position: center;
+      background-size: cover;
+      opacity: 0;
+      transform: scale(1.04);
+      transition: opacity 900ms ease, transform 6800ms ease;
+    }
+
+    .hero-slide.is-active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .hero-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      z-index: 3;
+      display: inline-flex;
+      gap: 10px;
+      transform: translateX(-50%);
+    }
+
+    .hero-dot {
+      width: 12px;
+      height: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 999px;
+      padding: 0;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: background 180ms ease, opacity 180ms ease, transform 180ms ease;
+    }
+
+    .hero-dot[aria-current="true"] {
+      background: rgba(255, 255, 255, 0.92);
+      transform: scale(1.12);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-slide {
+        transition: none;
+      }
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 980px;
+    }
+
+    .language-switch {
+      position: absolute;
+      top: 24px;
+      right: clamp(18px, 4vw, 56px);
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 8px;
+      background: rgba(11, 22, 18, 0.34);
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+
+    .language-switch button {
+      min-width: 52px;
+      border: 0;
+      border-radius: 6px;
+      padding: 8px 11px;
+      color: white;
+      background: transparent;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .language-switch button[aria-pressed="true"] {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      max-width: 920px;
+      font-family: "Fraunces", Georgia, "Times New Roman", serif;
+      font-size: clamp(40px, 9vw, 86px);
+      line-height: 1.02;
+      letter-spacing: 0;
+      text-shadow: 0 3px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 0 0 24px;
+      font-size: clamp(17px, 2vw, 22px);
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.42);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chip {
+      border: 1px solid rgba(255, 255, 255, 0.62);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(4px);
+      font-weight: 700;
+    }
+
+    main {
+      padding: 34px clamp(16px, 4vw, 56px) 56px;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .section {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto 36px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-family: "Fraunces", Georgia, "Times New Roman", serif;
+      font-size: clamp(27px, 4vw, 42px);
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-family: "Fraunces", Georgia, "Times New Roman", serif;
+      font-size: 23px;
+      letter-spacing: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(20, 35, 28, 0.06);
+    }
+
+    .card strong,
+    .tag {
+      font-weight: 800;
+    }
+
+    .tag {
+      display: inline-flex;
+      border-radius: 8px;
+      padding: 3px 9px;
+      margin: 0 6px 8px 0;
+      color: white;
+      background: var(--pine);
+      font-size: 13px;
+    }
+
+    .tag.gold {
+      background: var(--gold);
+    }
+
+    .tag.sea {
+      background: var(--sea);
+    }
+
+    .tag.rose {
+      background: var(--rose);
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .plan {
+      border-top: 2px solid var(--line);
+      padding-top: 30px;
+    }
+
+    .plan-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .map {
+      min-height: 430px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #e9eee8;
+    }
+
+    .route-line {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border-left: 4px solid var(--pine);
+      background: #eef5f0;
+      border-radius: 0 8px 8px 0;
+      font-weight: 800;
+    }
+
+    .days {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .day {
+      min-height: 155px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 13px;
+    }
+
+    .day-title {
+      display: block;
+      color: var(--pine);
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .sources {
+      font-size: 14px;
+    }
+
+    .spot-shell {
+      border-top: 2px solid var(--line);
+      padding-top: 28px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 14px 0 18px;
+    }
+
+    .filter {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      color: var(--ink);
+      padding: 9px 12px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .filter.is-active {
+      background: var(--pine);
+      border-color: var(--pine);
+      color: white;
+    }
+
+    .spot-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    #spotlight.is-collapsed #main-spots .spot-card:nth-of-type(n+9) {
+      display: none;
+    }
+
+    .spot-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(20, 35, 28, 0.06);
+    }
+
+    .spot-card[hidden] {
+      display: none;
+    }
+
+    .spot-card summary {
+      display: block;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .spot-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .spot-image {
+      position: relative;
+      min-height: 205px;
+      background: linear-gradient(135deg, #435148, #101d18) center/cover;
+    }
+
+    .spot-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.74));
+    }
+
+    .spot-title,
+    .spot-hover {
+      position: absolute;
+      z-index: 1;
+      color: white;
+    }
+
+    .spot-title {
+      inset: auto 12px 12px;
+    }
+
+    .spot-title b {
+      display: block;
+      font-size: 19px;
+      line-height: 1.2;
+    }
+
+    .spot-title span {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .spot-hover {
+      inset: 0;
+      display: grid;
+      align-content: end;
+      padding: 12px;
+      background: rgba(20, 31, 26, 0.78);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: 180ms ease;
+      pointer-events: none;
+    }
+
+    .spot-card:hover .spot-hover,
+    .spot-card:focus-within .spot-hover {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .spot-body {
+      padding: 13px;
+      border-top: 1px solid var(--line);
+    }
+
+    .spot-body p {
+      margin: 0 0 9px;
+    }
+
+    .spot-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      border-radius: 8px;
+      background: #eef5f0;
+      color: #234c3d;
+      padding: 3px 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .place-pop {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      border-bottom: 1px dotted var(--pine);
+      color: #164c3d;
+      font-weight: 800;
+      cursor: help;
+    }
+
+    .info-dot {
+      width: 15px;
+      height: 15px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--pine);
+      color: white;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 900;
+      transform: translateY(-5px);
+    }
+
+    .mini-card {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 10px);
+      z-index: 500;
+      width: min(380px, calc(100vw - 28px));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 18px 36px rgba(15, 25, 20, 0.22);
+      color: var(--ink);
+      opacity: 0;
+      transform: translate(-50%, 8px);
+      pointer-events: none;
+      transition: 160ms ease;
+      overflow: hidden;
+      font-weight: 400;
+      grid-template-columns: 112px minmax(0, 1fr);
+      min-height: 112px;
+    }
+
+    .place-pop:hover .mini-card,
+    .place-pop:focus-within .mini-card {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+      display: grid;
+    }
+
+    .mini-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 112px;
+      object-fit: cover;
+      background: #dfe7df;
+    }
+
+    .mini-card-body {
+      padding: 10px 11px 11px;
+    }
+
+    .mini-card b {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .mini-card p {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.42;
+    }
+
+    .mini-card a {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .expand-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .expand-btn {
+      border: 1px solid var(--pine);
+      border-radius: 8px;
+      background: var(--pine);
+      color: white;
+      padding: 10px 14px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 900;
+    }
+
+    .expand-btn::after {
+      content: " ↓";
+    }
+
+    .expand-btn[aria-expanded="true"]::after {
+      content: " ↑";
+    }
+
+    .leaflet-marker-icon.numbered-marker {
+      background: transparent;
+      border: 0;
+    }
+
+    .marker-dot {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 2px solid white;
+      border-radius: 50%;
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 3px 9px rgba(0, 0, 0, 0.28);
+    }
+
+    .marker-a {
+      background: var(--pine);
+    }
+
+    .marker-b {
+      background: var(--rose);
+    }
+
+    .marker-c {
+      background: var(--sea);
+    }
+
+    @media (max-width: 980px) {
+      .grid,
+      .choice,
+      .plan-head,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .days {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .spot-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      html,
+      body {
+        max-width: 100%;
+      }
+
+      .hero {
+        min-height: 72vh;
+        padding: 30px 16px;
+        width: 100%;
+      }
+
+      main {
+        padding: 24px 12px 42px;
+      }
+
+      h1 {
+        font-size: clamp(34px, 10vw, 44px);
+      }
+
+      .lede {
+        font-size: 16px;
+      }
+
+      .card,
+      .day {
+        padding: 14px;
+      }
+
+      .days {
+        grid-template-columns: 1fr;
+      }
+
+      .spot-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #spotlight.is-collapsed #main-spots .spot-card:nth-of-type(n+5) {
+        display: none;
+      }
+
+      .day {
+        min-height: auto;
+      }
+
+      .place-pop {
+        display: inline;
+        line-height: inherit;
+      }
+
+      .info-dot {
+        display: inline-grid;
+        vertical-align: super;
+        transform: none;
+      }
+
+      .mini-card {
+        position: fixed;
+        left: 12px;
+        right: auto;
+        top: 12px;
+        bottom: auto;
+        width: calc(100vw - 24px);
+        max-width: 360px;
+        grid-template-columns: 96px minmax(0, 1fr);
+        transform: translateY(8px);
+      }
+
+      .place-pop:hover .mini-card,
+      .place-pop:focus-within .mini-card {
+        transform: translateY(0);
+      }
+
+      .map {
+        min-height: 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-slides" data-hero-slides aria-hidden="true"></div>
+    <div class="language-switch" aria-label="Language">
+      <button type="button" data-lang-button="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang-button="zh" aria-pressed="false">ZH</button>
+    </div>
+    <div class="hero-inner">
+      <h1>英国 8 月 10 天路线方案</h1>
+      <p class="lede">5 人出行，伦敦往返，伦敦保留 1-2 天，主线放在爱丁堡、苏格兰高地、天空岛、湖区和约克之间取舍。</p>
+      <div class="chips">
+        <span class="chip">自然风光优先</span>
+        <span class="chip">可火车 + 局部租车</span>
+        <span class="chip">兼顾历史、军事、博物馆</span>
+      </div>
+    </div>
+    <div class="hero-dots" data-hero-dots aria-label="Hero image controls"></div>
+  </header>
+
+  <main>
+    <section class="section spot-shell is-collapsed" id="spotlight">
+      <h2>景点速览</h2>
+      <p class="note">点开卡片可以看简介、适合谁、建议时长和官网链接；桌面端 hover 会先浮出一句重点。</p>
+      <div class="filters" data-target="main-spots">
+        <button class="filter is-active" type="button" data-filter="all">全部</button>
+        <button class="filter" type="button" data-filter="nature">高地自然</button>
+        <button class="filter" type="button" data-filter="hike">徒步</button>
+        <button class="filter" type="button" data-filter="history">历史建筑</button>
+        <button class="filter" type="button" data-filter="museum">博物馆/军事</button>
+        <button class="filter" type="button" data-filter="rail">火车风景</button>
+      </div>
+      <div class="spot-grid" id="main-spots">
+        <details class="spot-card" data-category="nature hike">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-24.jpg');">
+              <div class="spot-title"><b>Old Man of Storr</b><span>Skye 北线｜地标徒步</span></div>
+              <div class="spot-hover">天空岛最经典的岩柱和山脊视野，清晨最值得。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2.5 小时</span><span class="pill">震撼景色</span><span class="pill">上坡徒步</span></div><p>适合想要“高地史诗感”的人。路线不长，但风大、路面湿滑时会明显变难。</p><a href="https://www.visitscotland.com/info/see-do/old-man-of-storr-p2570241" target="_blank" rel="noreferrer">VisitScotland 介绍</a></div>
+        </details>
+
+        <details class="spot-card" data-category="nature hike">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-25.jpg');">
+              <div class="spot-title"><b>Quiraing</b><span>Skye｜荒原山脊</span></div>
+              <div class="spot-hover">更野、更开阔，天气好时是全程自然风光天花板之一。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2-4 小时</span><span class="pill">强烈推荐</span><span class="pill">需看天气</span></div><p>适合喜欢原始地貌、山脊、草坡和远海视野的人。8 月停车紧张，建议早到。</p><a href="https://www.visitscotland.com/info/see-do/the-quiraing-p2571471" target="_blank" rel="noreferrer">VisitScotland 介绍</a></div>
+        </details>
+
+        <details class="spot-card" data-category="nature hike">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-26.jpg');">
+              <div class="spot-title"><b>Fairy Pools</b><span>Skye 西线｜溪谷和瀑布</span></div>
+              <div class="spot-hover">清澈水潭、黑色山体、短线步道，天气差也还能安排。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-3 小时</span><span class="pill">轻徒步</span><span class="pill">拍照</span></div><p>比 Quiraing 更轻松，适合把 Skye 西侧和 Talisker / Dunvegan 放在同一天。</p><a href="https://www.isleofskye.com/skye-guide/top-ten-skye-walks/fairy-pools" target="_blank" rel="noreferrer">Isle of Skye Guide</a></div>
+        </details>
+
+        <details class="spot-card" data-category="nature hike">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-20.jpg');">
+              <div class="spot-title"><b>Glencoe</b><span>高地｜山谷压迫感</span></div>
+              <div class="spot-hover">Three Sisters、Lost Valley、Rannoch Moor，阴天也很有气势。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">半天-1 天</span><span class="pill">高地核心</span><span class="pill">短徒步</span></div><p>不去 Skye 也值得保留。适合 Plan A/B，能用较少时间获得很强的高地视觉冲击。</p><a href="https://www.visitscotland.com/places-to-go/glencoe" target="_blank" rel="noreferrer">VisitScotland 介绍</a></div>
+        </details>
+
+        <details class="spot-card" data-category="nature history rail">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-22.jpg');">
+              <div class="spot-title"><b>Glenfinnan</b><span>Fort William 周边｜高架桥</span></div>
+              <div class="spot-hover">Viaduct、Loch Shiel、Jacobite 氛围，一站满足风景和历史。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2-4 小时</span><span class="pill">火车迷</span><span class="pill">停车早到</span></div><p>适合喜欢铁路、电影场景和 Jacobite 历史的人。蒸汽火车具体日期以官方放票为准。</p><a href="https://www.visitscotland.com/info/towns-villages/glenfinnan-p236571" target="_blank" rel="noreferrer">VisitScotland 介绍</a></div>
+        </details>
+
+        <details class="spot-card" data-category="history nature">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-23.jpg');">
+              <div class="spot-title"><b>Eilean Donan Castle</b><span>去 Skye 路上｜湖中城堡</span></div>
+              <div class="spot-hover">高地城堡明信片，适合放在 Fort William 到 Skye 的路上。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1-2 小时</span><span class="pill">历史建筑</span><span class="pill">顺路点</span></div><p>城堡不大，但位置非常漂亮。适合 Plan A/C 的转场日，不建议专门绕很远。</p><a href="https://www.eileandonancastle.com/visit/" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="history museum">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-14.jpg');">
+              <div class="spot-title"><b>Edinburgh Castle</b><span>爱丁堡｜军事和王室历史</span></div>
+              <div class="spot-hover">城堡、炮台、王冠、城市制高点，适合历史和军事兴趣。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2-3 小时</span><span class="pill">需预约</span><span class="pill">军事历史</span></div><p>8 月门票和时段紧，建议提前订。城堡本身比“打卡景点”更适合慢看。</p><a href="https://www.edinburghcastle.scot/plan-your-visit" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="museum history">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-02.jpg');">
+              <div class="spot-title"><b>National Museum of Scotland</b><span>爱丁堡｜免费博物馆</span></div>
+              <div class="spot-hover">雨天备用很强，历史、科技、自然史都能覆盖。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-3 小时</span><span class="pill">免费</span><span class="pill">雨天友好</span></div><p>适合全队分头逛，尤其适合需要城市缓冲、天气不稳或不想再爬坡的时候。</p><a href="https://www.nms.ac.uk/national-museum-of-scotland/plan-your-visit/" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="nature hike">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-29.jpg');">
+              <div class="spot-title"><b>Lake District</b><span>英格兰湖区｜稳定徒步</span></div>
+              <div class="spot-hover">Windermere、Ambleside、Keswick，后勤成熟，天气选择多。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2 天起</span><span class="pill">徒步</span><span class="pill">住宿选择多</span></div><p>适合 Plan B。湖区的优势是路线弹性强，轻松线和高强度线都能同一天调整。</p><a href="https://www.lakedistrict.gov.uk/visiting" target="_blank" rel="noreferrer">国家公园访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="history museum">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-32.jpg');">
+              <div class="spot-title"><b>York Minster</b><span>约克｜哥特大教堂</span></div>
+              <div class="spot-hover">建筑、彩窗、地下遗迹和登塔，历史密度很高。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2.5 小时</span><span class="pill">历史建筑</span><span class="pill">可登塔</span></div><p>适合 Plan C 的历史主菜。约克城墙、Shambles 可以接在同一天慢慢走。</p><a href="https://yorkminster.org/visit/" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="museum rail">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-33.jpg');">
+              <div class="spot-title"><b>National Railway Museum</b><span>约克｜铁路博物馆</span></div>
+              <div class="spot-hover">很适合对工程、军事运输、工业史感兴趣的人。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-3 小时</span><span class="pill">免费预约</span><span class="pill">铁路史</span></div><p>适合五人里对博物馆和历史技术感兴趣的人。约克到爱丁堡前安排很顺。</p><a href="https://www.railwaymuseum.org.uk/visit" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="rail nature">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-03.jpg');">
+              <div class="spot-title"><b>Kyle Line</b><span>Inverness → Kyle｜景观铁路</span></div>
+              <div class="spot-hover">不用长途自驾也能进入西北高地景色，适合火车派。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">单程约 2h40m</span><span class="pill">风景铁路</span><span class="pill">Plan C</span></div><p>沿线经过湖泊、荒原、海湾和山体。可以当天往返，也可以接 Plockton / Kyle 住宿。</p><a href="https://www.scotrail.co.uk/inspiration-hub/great-scenic-rail-journeys/kyle-line-lochalsh-inverness" target="_blank" rel="noreferrer">ScotRail 路线介绍</a></div>
+        </details>
+
+        <details class="spot-card" data-category="history museum">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-35.jpg');">
+              <div class="spot-title"><b>Culloden Battlefield</b><span>Inverness 周边｜战场遗址</span></div>
+              <div class="spot-hover">Jacobite Rising 的终点，对军事和历史兴趣者很值得。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2.5 小时</span><span class="pill">军事历史</span><span class="pill">Plan C</span></div><p>适合和 Clava Cairns、Loch Ness 同日安排。内容比外观看起来更有深度。</p><a href="https://www.nts.org.uk/visit/places/culloden/" target="_blank" rel="noreferrer">National Trust for Scotland</a></div>
+        </details>
+
+        <details class="spot-card" data-category="history nature">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-04.jpg');">
+              <div class="spot-title"><b>Loch Ness / Urquhart Castle</b><span>Inverness 周边｜湖泊和遗址</span></div>
+              <div class="spot-hover">不是最野的高地，但交通顺、知名度高，适合转场日。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2-4 小时</span><span class="pill">顺路点</span><span class="pill">历史遗址</span></div><p>适合从 Skye 回 Inverness，或 Inverness 周边一日线。风景不如 Skye 野，但行程稳定。</p><a href="https://www.historicenvironment.scot/visit-a-place/places/urquhart-castle" target="_blank" rel="noreferrer">Urquhart Castle 官方信息</a></div>
+        </details>
+
+        <details class="spot-card" data-category="museum history">
+          <summary>
+            <div class="spot-image" style="background-image:url('assets/images/trip-img-12.jpg');">
+              <div class="spot-title"><b>Churchill War Rooms</b><span>伦敦｜二战地下指挥部</span></div>
+              <div class="spot-hover">军事和近现代史兴趣者的伦敦重点，建议提前订票。</div>
+            </div>
+          </summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2.5 小时</span><span class="pill">军事历史</span><span class="pill">需预约</span></div><p>适合放在返程前半天。空间在地下，旺季会拥挤，官方建议提前订票。</p><a href="https://www.iwm.org.uk/visits/churchill-war-rooms" target="_blank" rel="noreferrer">IWM 官方访问信息</a></div>
+        </details>
+      </div>
+      <div class="expand-row">
+        <button class="expand-btn" type="button" data-expand-target="spotlight" aria-expanded="false">展开全部景点</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>先看结论</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="tag">高地经典</span>
+          <h3>A. 天空岛 + 高地震撼线</h3>
+          <p>适合最想看原始、壮观、能 hiking 的路线。代价是有 4 天左右需要租车，住宿要尽早订。</p>
+        </article>
+        <article class="card">
+          <span class="tag rose">徒步均衡</span>
+          <h3>B. 湖区 + 爱丁堡 + Glencoe</h3>
+          <p>湖区徒步质量高，高地只抓 Glencoe、Fort William、Glenfinnan，不硬塞天空岛。</p>
+        </article>
+        <article class="card">
+          <span class="tag sea">火车友好</span>
+          <h3>C. 约克 + 因弗内斯慢旅行</h3>
+          <p>开车压力最低，约克补足历史和博物馆，Kyle Line 作为高地景观铁路很漂亮。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <h2>你们关心的景点池</h2>
+      <div class="split">
+        <div>
+          <h3>自然风光和徒步</h3>
+          <ul>
+            <li><strong>Isle of Skye 天空岛：</strong>Old Man of Storr、Quiraing、Fairy Pools、Sligachan。最有“史诗感”，但 8 月人多、路窄、住宿紧。</li>
+            <li><strong>Glencoe：</strong>Three Sisters、Lost Valley、Rannoch Moor。高地压迫感很强，适合半天到一天。</li>
+            <li><strong>Fort William：</strong>Ben Nevis 周边、Nevis Gorge、Glenfinnan Viaduct。可接蒸汽火车或普通 West Highland Line。</li>
+            <li><strong>Lake District 湖区：</strong>Windermere、Ambleside、Keswick、Catbells、Helvellyn。徒步体验稳定，交通比天空岛简单。</li>
+          </ul>
+        </div>
+        <div>
+          <h3>历史、军事、博物馆</h3>
+          <ul>
+            <li><strong>Edinburgh：</strong>Edinburgh Castle、Royal Mile、National Museum of Scotland、Arthur's Seat。</li>
+            <li><strong>York：</strong>York Minster、城墙、Shambles、National Railway Museum。非常适合对历史建筑和交通/工业博物馆感兴趣的人。</li>
+            <li><strong>Inverness 周边：</strong>Culloden Battlefield、Clava Cairns、Urquhart Castle、Loch Ness。</li>
+            <li><strong>London：</strong>Tower of London、Imperial War Museum、Churchill War Rooms、British Museum。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section plan" id="plan-a">
+      <div class="plan-head">
+        <div>
+          <span class="tag">Plan A</span>
+          <h2>天空岛 + 高地震撼线｜10 天</h2>
+          <p>这是最贴近“原始、震撼、壮观自然景色”的方案。伦敦只留到达和返程缓冲，核心时间给爱丁堡、高地、天空岛。</p>
+          <p class="route-line">伦敦 → 爱丁堡 → Stirling → Glencoe → Fort William → Glenfinnan → Eilean Donan → Skye → Inverness → 伦敦</p>
+          <p class="note">交通：伦敦到爱丁堡坐火车；爱丁堡取车，因弗内斯还车；因弗内斯回伦敦可坐白天火车或 Caledonian Sleeper。5 人租一辆 7 座车更舒服。</p>
+        </div>
+        <div id="map-a" class="map" aria-label="Plan A route map"></div>
+      </div>
+
+      <div class="days">
+        <article class="day"><span class="day-title">D1 伦敦</span>抵达、时差缓冲。轻松走 South Bank、Covent Garden，晚上早点休息。</article>
+        <article class="day"><span class="day-title">D2 伦敦 → 爱丁堡</span>上午 Tower of London 或 Churchill War Rooms；下午火车去 Edinburgh，住 Old Town / New Town。</article>
+        <article class="day"><span class="day-title">D3 爱丁堡</span>Edinburgh Castle、Royal Mile、National Museum of Scotland；体力好加 Arthur's Seat 日落。</article>
+        <article class="day"><span class="day-title">D4 爱丁堡 → Glencoe</span>取车，途经 Stirling Castle、Loch Lomond / Trossachs、Rannoch Moor，住 Fort William 或 Glencoe。</article>
+        <article class="day"><span class="day-title">D5 Fort William</span>Nevis Gorge 或 Glen Nevis 短徒步；下午 Glenfinnan Viaduct、Loch Shiel。Jacobite 只作可选。</article>
+        <article class="day"><span class="day-title">D6 去天空岛</span>Fort William → Eilean Donan Castle → Portree。傍晚 Sligachan 或 Portree 港口。</article>
+        <article class="day"><span class="day-title">D7 Skye 北线</span>Old Man of Storr、Kilt Rock、Quiraing、Fairy Glen。最适合放一天给徒步和拍照。</article>
+        <article class="day"><span class="day-title">D8 Skye 西线</span>Fairy Pools、Talisker Bay 或 Dunvegan Castle；天气差就改城堡/小镇。</article>
+        <article class="day"><span class="day-title">D9 Skye → Inverness</span>经 Loch Ness、Urquhart Castle，因弗内斯还车；晚上可坐卧铺南下或住 Inverness。</article>
+        <article class="day"><span class="day-title">D10 回伦敦</span>白天火车回伦敦或卧铺早到伦敦后补一个博物馆半日，返程。</article>
+      </div>
+    </section>
+
+    <section class="section plan" id="plan-b">
+      <div class="plan-head">
+        <div>
+          <span class="tag rose">Plan B</span>
+          <h2>湖区徒步 + 爱丁堡 + Glencoe｜10 天</h2>
+          <p>如果你们想少一点高地长途开车，又保留高质量徒步和壮观山谷，这套更均衡。湖区很适合 5 人找 cottage 或公寓。</p>
+          <p class="route-line">伦敦 → Lake District → 爱丁堡 → Glencoe → Fort William / Glenfinnan → Glasgow → 伦敦</p>
+          <p class="note">交通：伦敦到 Oxenholme 可火车；湖区本地可租车 2 天；爱丁堡到高地建议租车或参加小团。</p>
+        </div>
+        <div id="map-b" class="map" aria-label="Plan B route map"></div>
+      </div>
+
+      <div class="days">
+        <article class="day"><span class="day-title">D1 伦敦</span>抵达缓冲，住 King’s Cross / Euston 一带方便次日火车。</article>
+        <article class="day"><span class="day-title">D2 伦敦 → 湖区</span>火车到 Oxenholme / Windermere，下午 Windermere 湖边、Bowness。</article>
+        <article class="day"><span class="day-title">D3 湖区徒步</span>Catbells、Loughrigg Fell 或 Helvellyn。根据天气和队伍体力选线。</article>
+        <article class="day"><span class="day-title">D4 湖区 → 爱丁堡</span>上午 Ambleside / Grasmere；下午北上 Edinburgh。</article>
+        <article class="day"><span class="day-title">D5 爱丁堡</span>Edinburgh Castle、Royal Mile、National Museum；军事/历史兴趣者优先城堡和博物馆。</article>
+        <article class="day"><span class="day-title">D6 爱丁堡 → Glencoe</span>取车或小团，途经 Stirling、Loch Lomond、Rannoch Moor，住 Glencoe / Fort William。</article>
+        <article class="day"><span class="day-title">D7 Glencoe 徒步</span>Three Sisters、Lost Valley 或 Glencoe Lochan。天气不好也能做短线。</article>
+        <article class="day"><span class="day-title">D8 Glenfinnan / Mallaig</span>Glenfinnan Viaduct、Loch Shiel，或普通火车 / Jacobite 到 Mallaig。</article>
+        <article class="day"><span class="day-title">D9 Glasgow / 伦敦</span>还车，Glasgow 半日城市休整；晚火车或卧铺回伦敦。</article>
+        <article class="day"><span class="day-title">D10 伦敦返程</span>补 Imperial War Museum、Churchill War Rooms 或购物，返程。</article>
+      </div>
+    </section>
+
+    <section class="section plan" id="plan-c">
+      <div class="plan-head">
+        <div>
+          <span class="tag sea">Plan C</span>
+          <h2>火车优先 + 约克历史线｜10 天</h2>
+          <p>这套适合不想一路开车的人。约克给历史和博物馆，因弗内斯作为高地基地，用 Kyle Line 和一日租车/包车补足自然风光。</p>
+          <p class="route-line">伦敦 → York → 爱丁堡 → Inverness → Kyle of Lochalsh / Plockton → Loch Ness → 伦敦</p>
+          <p class="note">交通：主干全火车；因弗内斯周边可租车 1-2 天。Kyle Line 单程约 2 小时 40 分，适合把“路本身”当景点。</p>
+        </div>
+        <div id="map-c" class="map" aria-label="Plan C route map"></div>
+      </div>
+
+      <div class="days">
+        <article class="day"><span class="day-title">D1 伦敦</span>抵达缓冲，按体力安排 British Museum 或 Thames 河边散步。</article>
+        <article class="day"><span class="day-title">D2 伦敦 → York</span>火车到 York。下午 York Minster、城墙、Shambles，住 York。</article>
+        <article class="day"><span class="day-title">D3 York → 爱丁堡</span>上午 National Railway Museum；午后火车到 Edinburgh，晚上 Calton Hill。</article>
+        <article class="day"><span class="day-title">D4 爱丁堡</span>Edinburgh Castle、Royal Mile、Holyrood Palace 或 National Museum。</article>
+        <article class="day"><span class="day-title">D5 爱丁堡 → Inverness</span>火车北上，下午 Inverness 河边、Leakey's Bookshop、城堡外观。</article>
+        <article class="day"><span class="day-title">D6 Kyle Line</span>Inverness → Plockton / Kyle of Lochalsh，沿线看 Torridon peaks、Loch Carron、Skye 海峡景色。</article>
+        <article class="day"><span class="day-title">D7 Eilean Donan / Skye 边缘</span>从 Kyle 租车或包车去 Eilean Donan、Plockton、Sligachan；不深入 Skye 北线，节奏更稳。</article>
+        <article class="day"><span class="day-title">D8 Loch Ness 历史日</span>Culloden Battlefield、Clava Cairns、Loch Ness、Urquhart Castle，晚上 Inverness。</article>
+        <article class="day"><span class="day-title">D9-10 回伦敦</span>Caledonian Sleeper 或白天火车。若多一天，伦敦安排 Imperial War Museum 或 Churchill War Rooms。</article>
+      </div>
+    </section>
+
+    <section class="section spot-shell" id="alternatives">
+      <h2>备选景点</h2>
+      <p class="note">适合天气变化、票订不到、想把路线调得更松时替换使用。</p>
+      <div class="filters" data-target="alt-spots">
+        <button class="filter is-active" type="button" data-filter="all">全部</button>
+        <button class="filter" type="button" data-filter="nature">自然</button>
+        <button class="filter" type="button" data-filter="history">历史建筑</button>
+        <button class="filter" type="button" data-filter="museum">博物馆</button>
+        <button class="filter" type="button" data-filter="city">城市</button>
+      </div>
+      <div class="spot-grid" id="alt-spots">
+        <details class="spot-card" data-category="history">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-18.jpg');"><div class="spot-title"><b>Stirling Castle</b><span>爱丁堡到高地路上</span></div><div class="spot-hover">苏格兰王权和战史核心点，适合替换 Loch Lomond 短停。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2.5 小时</span><span class="pill">历史</span></div><p>适合对军事、城堡、苏格兰历史感兴趣的人。Plan A/B 去高地时很顺路。</p><a href="https://www.stirlingcastle.scot/plan-your-visit/" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+        <details class="spot-card" data-category="nature">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-19.jpg');"><div class="spot-title"><b>Loch Lomond</b><span>低地到高地过渡</span></div><div class="spot-hover">比 Skye 温柔，但很适合转场日休息和湖边短走。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1-3 小时</span><span class="pill">轻松</span></div><p>适合从爱丁堡/格拉斯哥开往 Glencoe 的路上停，不会让当天太累。</p><a href="https://www.lochlomond-trossachs.org/" target="_blank" rel="noreferrer">国家公园官网</a></div>
+        </details>
+        <details class="spot-card" data-category="nature">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-59.jpg');"><div class="spot-title"><b>Cairngorms</b><span>爱丁堡到 Inverness 之间</span></div><div class="spot-hover">森林、山地、野生动物，比 Skye 更适合慢旅行。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">半天-2 天</span><span class="pill">自然</span></div><p>如果不去 Skye 又想保留高地自然，可以用 Aviemore / Cairngorms 替换一段。</p><a href="https://www.cairngorms.co.uk/" target="_blank" rel="noreferrer">Cairngorms National Park</a></div>
+        </details>
+        <details class="spot-card" data-category="nature city">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-64.jpg');"><div class="spot-title"><b>Oban</b><span>西海岸小镇</span></div><div class="spot-hover">海鲜、港口、岛屿感，适合高地行程想加一点海岸气息。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">半天-1 天</span><span class="pill">小镇</span></div><p>如果从 Glencoe 往西海岸绕一点，Oban 比 Skye 轻松很多。</p><a href="https://www.visitscotland.com/info/towns-villages/oban-p236151" target="_blank" rel="noreferrer">VisitScotland 介绍</a></div>
+        </details>
+        <details class="spot-card" data-category="history">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-52.jpg');"><div class="spot-title"><b>Dunnottar Castle</b><span>东海岸悬崖城堡</span></div><div class="spot-hover">画面感非常强，但位置偏东，适合改走 Aberdeen 方向。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">1.5-2 小时</span><span class="pill">城堡</span></div><p>不适合硬塞进 Skye 线，但如果放弃西北高地、改东海岸，会很出彩。</p><a href="https://www.dunnottarcastle.co.uk/plan-your-visit/" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+        <details class="spot-card" data-category="history">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-41.jpg');"><div class="spot-title"><b>Durham Cathedral</b><span>伦敦-爱丁堡铁路沿线</span></div><div class="spot-hover">如果不住 York，可把 Durham 当作历史建筑短停。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">2-4 小时</span><span class="pill">铁路顺路</span></div><p>适合替代 York 的轻量版本。城市小，火车站到核心区可步行或短车程。</p><a href="https://www.durhamcathedral.co.uk/visit-us" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+        <details class="spot-card" data-category="museum city">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-36.jpg');"><div class="spot-title"><b>Glasgow 博物馆半日</b><span>返伦敦前缓冲</span></div><div class="spot-hover">Kelvingrove、Riverside Museum 适合雨天和城市休整。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">半天</span><span class="pill">免费馆多</span></div><p>Plan B 从高地回程时很好用，节奏比继续赶自然景点更舒服。</p><a href="https://www.glasgowlife.org.uk/museums" target="_blank" rel="noreferrer">Glasgow Museums</a></div>
+        </details>
+        <details class="spot-card" data-category="history city">
+          <summary><div class="spot-image" style="background-image:url('assets/images/trip-img-14.jpg');"><div class="spot-title"><b>Alnwick Castle</b><span>英格兰东北｜城堡</span></div><div class="spot-hover">适合电影/城堡兴趣，但公共交通衔接比 York 麻烦。</div></div></summary>
+          <div class="spot-body"><div class="spot-meta"><span class="pill">半天</span><span class="pill">城堡</span></div><p>如果从 York / Newcastle 一带租车或包车，可以作为历史建筑备选。</p><a href="https://www.alnwickcastle.com/visit" target="_blank" rel="noreferrer">官方访问信息</a></div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>怎么选</h2>
+      <div class="choice">
+        <article class="card">
+          <h3>想要最震撼</h3>
+          <p>选 A。Skye + Glencoe 是这三套里自然冲击力最强的组合。注意 8 月住宿和停车都要尽早处理。</p>
+        </article>
+        <article class="card">
+          <h3>想徒步更舒服</h3>
+          <p>选 B。湖区徒步选择多、后勤成熟，再用 Glencoe 补高地气势。</p>
+        </article>
+        <article class="card">
+          <h3>想少开车</h3>
+          <p>选 C。高地景色用火车和短包车解决，约克让历史/博物馆需求更扎实。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section card">
+      <h2>预订提醒</h2>
+      <ul>
+        <li><strong>8 月是高峰季：</strong>Skye、Glencoe、Fort William、湖区住宿越早越好，5 人房型更容易被订完。</li>
+        <li><strong>Edinburgh 8 月有艺术节氛围：</strong>城市会非常热闹，酒店价格和餐厅预约压力上升。</li>
+        <li><strong>Jacobite 2026：</strong>官方目前显示 2026 预订和具体运行日期仍需等待确认；可以把它当加分项，不要把核心路线完全绑定在它上面。</li>
+        <li><strong>租车：</strong>英国左行，Skye 单车道多，建议至少两位司机；5 人加行李优先 7 座车或两辆小车。</li>
+        <li><strong>徒步：</strong>高地天气变化快，防水外套、徒步鞋、离线地图必备。Skye 的 Quiraing 和 Old Man of Storr 早出发体验明显更好。</li>
+      </ul>
+    </section>
+
+    <section class="section sources">
+      <h2>信息来源</h2>
+      <p>交通和景点开放信息核对于 2026-04-17：<a href="https://www.sleeper.scot/about/our-trains/">Caledonian Sleeper routes</a>、<a href="https://www.scotrail.co.uk/inspiration-hub/great-scenic-rail-journeys/kyle-line-lochalsh-inverness">ScotRail Kyle Line</a>、<a href="https://www.avantiwestcoast.co.uk/travel-information/train-times/london-euston/oxenholme-lake-district">Avanti London-Oxenholme</a>、<a href="https://www.edinburghcastle.scot/plan-your-visit/opening-times/">Edinburgh Castle</a>、<a href="https://www.railwaymuseum.org.uk/visit">National Railway Museum York</a>、<a href="https://www.eileandonancastle.com/visit/opening-hours/">Eilean Donan Castle</a>、<a href="https://westcoastrailways.co.uk/jacobite/timetables">West Coast Railways Jacobite timetable</a>、<a href="https://www.lakedistrict.gov.uk/visiting">Lake District National Park</a>、<a href="https://www.visitscotland.com/">VisitScotland</a>。</p>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylineDecorator.js"></script>
+  <script>
+    const heroSlides = [
+      {
+        src: "assets/images/hero-storr.jpg",
+        label: "Old Man of Storr"
+      },
+      {
+        src: "assets/images/hero-edinburgh.jpg",
+        label: "Edinburgh dawn skyline"
+      },
+      {
+        src: "assets/images/hero-glenfinnan.jpg",
+        label: "Glenfinnan Viaduct"
+      },
+      {
+        src: "assets/images/hero-eilean-donan.jpg",
+        label: "Eilean Donan Castle"
+      }
+    ];
+
+    let currentHeroSlide = 0;
+    let heroTimer = null;
+
+    function setHeroSlide(index) {
+      currentHeroSlide = index;
+      document.querySelectorAll("[data-hero-slide]").forEach((slide, slideIndex) => {
+        slide.classList.toggle("is-active", slideIndex === index);
+      });
+      document.querySelectorAll("[data-hero-dot]").forEach((dot, dotIndex) => {
+        if (dotIndex === index) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    function startHeroAutoplay() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      clearInterval(heroTimer);
+      heroTimer = setInterval(() => {
+        setHeroSlide((currentHeroSlide + 1) % heroSlides.length);
+      }, 6000);
+    }
+
+    function wireHeroCarousel() {
+      const slideRoot = document.querySelector("[data-hero-slides]");
+      const dotRoot = document.querySelector("[data-hero-dots]");
+      heroSlides.forEach((item, index) => {
+        const slide = document.createElement("span");
+        slide.className = "hero-slide";
+        slide.dataset.heroSlide = String(index);
+        slide.style.backgroundImage = `url("${item.src}")`;
+        slideRoot.appendChild(slide);
+
+        const dot = document.createElement("button");
+        dot.className = "hero-dot";
+        dot.type = "button";
+        dot.dataset.heroDot = String(index);
+        dot.setAttribute("aria-label", `Show hero image ${index + 1}: ${item.label}`);
+        dot.addEventListener("click", () => {
+          setHeroSlide(index);
+          startHeroAutoplay();
+        });
+        dotRoot.appendChild(dot);
+      });
+      setHeroSlide(0);
+      startHeroAutoplay();
+    }
+
+    const translations = {
+      "英国 8 月 10 天路线方案": "A 10-Day UK Summer Route",
+      "5 人出行，伦敦往返，伦敦保留 1-2 天，主线放在爱丁堡、苏格兰高地、天空岛、湖区和约克之间取舍。": "A London round trip for five, shaped around wild Highland scenery, a little city time, and smart tradeoffs between Skye, Edinburgh, the Lake District, and York.",
+      "自然风光优先": "Big landscapes first",
+      "可火车 + 局部租车": "Rail legs, scenic drives",
+      "兼顾历史、军事、博物馆": "Castles, war rooms, museums",
+      "景点速览": "Where The Trip Comes Alive",
+      "点开卡片可以看简介、适合谁、建议时长和官网链接；桌面端 hover 会先浮出一句重点。": "Open a card for timing, mood, and the practical link. On desktop, hover for the quick read.",
+      "全部": "All",
+      "高地自然": "Highland nature",
+      "徒步": "Hikes",
+      "历史建筑": "Historic sites",
+      "博物馆/军事": "Museums / military",
+      "火车风景": "Scenic rail",
+      "Skye 北线｜地标徒步": "North Skye | the classic climb",
+      "天空岛最经典的岩柱和山脊视野，清晨最值得。": "Go early for the cleanest light, quieter paths, and that unmistakable Skye skyline.",
+      "1.5-2.5 小时": "1.5-2.5 hours",
+      "震撼景色": "Big scenery",
+      "上坡徒步": "Uphill walk",
+      "适合想要“高地史诗感”的人。路线不长，但风大、路面湿滑时会明显变难。": "The walk is short enough to fit into a busy day, but it still feels properly dramatic. Wind and wet ground can change the difficulty fast.",
+      "VisitScotland 介绍": "VisitScotland guide",
+      "Skye｜荒原山脊": "Skye | wild ridges",
+      "更野、更开阔，天气好时是全程自然风光天花板之一。": "Wide, strange, and windswept. In clear weather, this can be the most memorable landscape of the whole trip.",
+      "2-4 小时": "2-4 hours",
+      "强烈推荐": "Top pick",
+      "需看天气": "Weather dependent",
+      "适合喜欢原始地貌、山脊、草坡和远海视野的人。8 月停车紧张，建议早到。": "Come for ridges, grass slopes, sea views, and the feeling of being somewhere much larger than the road suggests. August parking rewards early starts.",
+      "Skye 西线｜溪谷和瀑布": "West Skye | pools and falls",
+      "清澈水潭、黑色山体、短线步道，天气差也还能安排。": "A lighter Skye walk with clear pools, dark hills, and enough drama even when the weather refuses to cooperate.",
+      "1.5-3 小时": "1.5-3 hours",
+      "轻徒步": "Easy hike",
+      "拍照": "Photos",
+      "比 Quiraing 更轻松，适合把 Skye 西侧和 Talisker / Dunvegan 放在同一天。": "A flexible west Skye stop that pairs well with Talisker Bay or Dunvegan when the day needs to stay manageable.",
+      "高地｜山谷压迫感": "Highlands | cinematic glen",
+      "Three Sisters、Lost Valley、Rannoch Moor，阴天也很有气势。": "Moody weather suits Glencoe. The cliffs, passes, and valleys only get more atmospheric.",
+      "半天-1 天": "Half day-1 day",
+      "高地核心": "Highland core",
+      "短徒步": "Short hike",
+      "不去 Skye 也值得保留。适合 Plan A/B，能用较少时间获得很强的高地视觉冲击。": "Even without Skye, Glencoe earns its place. It gives the route a true Highland center of gravity without taking over the schedule.",
+      "Fort William 周边｜高架桥": "Near Fort William | viaduct",
+      "Viaduct、Loch Shiel、Jacobite 氛围，一站满足风景和历史。": "A compact stop with the viaduct, Loch Shiel, railway nostalgia, and Highland history all in one frame.",
+      "火车迷": "Rail fans",
+      "停车早到": "Arrive early",
+      "适合喜欢铁路、电影场景和 Jacobite 历史的人。蒸汽火车具体日期以官方放票为准。": "Good for railway, film-location, and Jacobite history interests. Steam train dates depend on official ticket releases.",
+      "去 Skye 路上｜湖中城堡": "On the road to Skye | loch castle",
+      "高地城堡明信片，适合放在 Fort William 到 Skye 的路上。": "The postcard castle moment of the route, perfectly placed between Fort William and Skye.",
+      "1-2 小时": "1-2 hours",
+      "顺路点": "En-route stop",
+      "城堡不大，但位置非常漂亮。适合 Plan A/C 的转场日，不建议专门绕很远。": "The castle is compact, but the setting is beautiful. Great for a transfer day, not worth a major detour.",
+      "官方访问信息": "Official visit info",
+      "爱丁堡｜军事和王室历史": "Edinburgh | military and royal history",
+      "城堡、炮台、王冠、城市制高点，适合历史和军事兴趣。": "Castle, batteries, crown jewels, and city views for history and military interests.",
+      "2-3 小时": "2-3 hours",
+      "需预约": "Book ahead",
+      "军事历史": "Military history",
+      "8 月门票和时段紧，建议提前订。城堡本身比“打卡景点”更适合慢看。": "August slots sell quickly, so book ahead. It rewards slower looking more than a quick photo stop.",
+      "爱丁堡｜免费博物馆": "Edinburgh | free museum",
+      "雨天备用很强，历史、科技、自然史都能覆盖。": "A strong rainy-day option covering history, technology, and natural history.",
+      "免费": "Free",
+      "雨天友好": "Rain friendly",
+      "适合全队分头逛，尤其适合需要城市缓冲、天气不稳或不想再爬坡的时候。": "Easy for the group to split by interest, especially when the weather is unstable or everyone needs a city breather.",
+      "英格兰湖区｜稳定徒步": "English Lake District | reliable hiking",
+      "Windermere、Ambleside、Keswick，后勤成熟，天气选择多。": "Windermere, Ambleside, and Keswick have mature logistics and lots of weather-flexible choices.",
+      "2 天起": "2+ days",
+      "住宿选择多": "Good lodging options",
+      "适合 Plan B。湖区的优势是路线弹性强，轻松线和高强度线都能同一天调整。": "Best for Plan B. Its strength is flexibility: easy walks and harder routes can be chosen on the day.",
+      "国家公园访问信息": "National park visitor info",
+      "约克｜哥特大教堂": "York | Gothic cathedral",
+      "建筑、彩窗、地下遗迹和登塔，历史密度很高。": "Architecture, stained glass, undercroft remains, and tower climbs with serious historical depth.",
+      "可登塔": "Tower climb",
+      "适合 Plan C 的历史主菜。约克城墙、Shambles 可以接在同一天慢慢走。": "The historical anchor for Plan C. York walls and the Shambles pair well on the same slow day.",
+      "约克｜铁路博物馆": "York | railway museum",
+      "很适合对工程、军事运输、工业史感兴趣的人。": "Great for engineering, military transport, and industrial history interests.",
+      "免费预约": "Free, reserve",
+      "铁路史": "Rail history",
+      "适合五人里对博物馆和历史技术感兴趣的人。约克到爱丁堡前安排很顺。": "A smooth fit before the York to Edinburgh train, especially for museum and transport-history people.",
+      "Inverness → Kyle｜景观铁路": "Inverness to Kyle | scenic rail",
+      "不用长途自驾也能进入西北高地景色，适合火车派。": "A way into northwest Highland scenery without a long drive.",
+      "单程约 2h40m": "About 2h40m one way",
+      "风景铁路": "Scenic railway",
+      "沿线经过湖泊、荒原、海湾和山体。可以当天往返，也可以接 Plockton / Kyle 住宿。": "The line passes lochs, moorland, sea inlets, and mountains. Do it as a day return or stay around Plockton or Kyle.",
+      "ScotRail 路线介绍": "ScotRail route guide",
+      "Inverness 周边｜战场遗址": "Near Inverness | battlefield",
+      "Jacobite Rising 的终点，对军事和历史兴趣者很值得。": "The endpoint of the Jacobite Rising, worthwhile for military and history interests.",
+      "适合和 Clava Cairns、Loch Ness 同日安排。内容比外观看起来更有深度。": "Pairs well with Clava Cairns and Loch Ness. The interpretation is deeper than the site first appears.",
+      "Inverness 周边｜湖泊和遗址": "Near Inverness | loch and ruins",
+      "不是最野的高地，但交通顺、知名度高，适合转场日。": "Not the wildest Highlands, but easy, famous, and useful on a transfer day.",
+      "历史遗址": "Historic ruins",
+      "适合从 Skye 回 Inverness，或 Inverness 周边一日线。风景不如 Skye 野，但行程稳定。": "Good when returning from Skye to Inverness or as an Inverness day trip. Less wild than Skye, but reliable.",
+      "Urquhart Castle 官方信息": "Urquhart Castle official info",
+      "伦敦｜二战地下指挥部": "London | WWII underground command",
+      "军事和近现代史兴趣者的伦敦重点，建议提前订票。": "A London highlight for military and modern-history interests. Book ahead.",
+      "适合放在返程前半天。空间在地下，旺季会拥挤，官方建议提前订票。": "A good final half-day in London. It is underground and can feel crowded in peak season, so advance tickets help.",
+      "IWM 官方访问信息": "IWM official visit info",
+      "展开全部景点": "Show all places",
+      "收起景点": "Collapse places",
+      "先看结论": "Start Here",
+      "高地经典": "Highland classic",
+      "A. 天空岛 + 高地震撼线": "A. Skye And The Big Highlands",
+      "适合最想看原始、壮观、能 hiking 的路线。代价是有 4 天左右需要租车，住宿要尽早订。": "Choose this for the wildest scenery and the strongest sense of adventure. It asks for a few driving days and early hotel booking.",
+      "徒步均衡": "Easier pace",
+      "B. 湖区 + 爱丁堡 + Glencoe": "B. Lake District + Edinburgh + Glencoe",
+      "湖区徒步质量高，高地只抓 Glencoe、Fort William、Glenfinnan，不硬塞天空岛。": "A softer route with excellent walking in the Lakes and a focused taste of the Highlands around Glencoe and Fort William.",
+      "火车友好": "Rail-led",
+      "C. 约克 + 因弗内斯慢旅行": "C. York, Inverness And Scenic Rail",
+      "开车压力最低，约克补足历史和博物馆，Kyle Line 作为高地景观铁路很漂亮。": "The least stressful option behind the wheel, with York for history and the Kyle Line for Highland scenery by train.",
+      "你们关心的景点池": "The Places That Shape The Route",
+      "自然风光和徒步": "Landscapes And Walks",
+      "Isle of Skye 天空岛：": "Isle of Skye:",
+      "最有“史诗感”，但 8 月人多、路窄、住宿紧。": "Old Man of Storr, Quiraing, Fairy Pools, and Sligachan. This is the most cinematic choice, but August brings crowds, narrow roads, and tight lodging.",
+      "Old Man of Storr、Quiraing、Fairy Pools、Sligachan。最有“史诗感”，但 8 月人多、路窄、住宿紧。": "Old Man of Storr, Quiraing, Fairy Pools, and Sligachan. This is the most cinematic choice, but August brings crowds, narrow roads, and tight lodging.",
+      "Glencoe：": "Glencoe:",
+      "高地压迫感很强，适合半天到一天。": "Three Sisters, Lost Valley, and Rannoch Moor. A dramatic glen that works well as a half-day or full-day Highland anchor.",
+      "Three Sisters、Lost Valley、Rannoch Moor。高地压迫感很强，适合半天到一天。": "Three Sisters, Lost Valley, and Rannoch Moor. A dramatic glen that works well as a half-day or full-day Highland anchor.",
+      "Fort William：": "Fort William:",
+      "可接蒸汽火车或普通 West Highland Line。": "Ben Nevis, Nevis Gorge, and Glenfinnan. A practical base for mountain walks and the West Highland railway.",
+      "Ben Nevis 周边、Nevis Gorge、Glenfinnan Viaduct。可接蒸汽火车或普通 West Highland Line。": "Ben Nevis, Nevis Gorge, and Glenfinnan. A practical base for mountain walks and the West Highland railway.",
+      "Lake District 湖区：": "Lake District:",
+      "徒步体验稳定，交通比天空岛简单。": "Windermere, Ambleside, Keswick, Catbells, and Helvellyn. Reliable walking, easier logistics, and more backup plans than Skye.",
+      "Windermere、Ambleside、Keswick、Catbells、Helvellyn。徒步体验稳定，交通比天空岛简单。": "Windermere, Ambleside, Keswick, Catbells, and Helvellyn. Reliable walking, easier logistics, and more backup plans than Skye.",
+      "历史、军事、博物馆": "History, Castles And Museums",
+      "Edinburgh：": "Edinburgh:",
+      "Edinburgh Castle、Royal Mile、National Museum of Scotland、Arthur's Seat。": "Edinburgh Castle, the Royal Mile, National Museum of Scotland, and Arthur's Seat.",
+      "York：": "York:",
+      "York Minster、城墙、Shambles、National Railway Museum。非常适合对历史建筑和交通/工业博物馆感兴趣的人。": "York Minster, city walls, the Shambles, and the National Railway Museum. Excellent for historic architecture and transport or industrial museums.",
+      "Inverness 周边：": "Around Inverness:",
+      "Culloden Battlefield、Clava Cairns、Urquhart Castle、Loch Ness。": "Culloden Battlefield, Clava Cairns, Urquhart Castle, and Loch Ness.",
+      "London：": "London:",
+      "Tower of London、Imperial War Museum、Churchill War Rooms、British Museum。": "Tower of London, Imperial War Museum, Churchill War Rooms, and the British Museum.",
+      "天空岛 + 高地震撼线｜10 天": "Skye And The Big Highlands | 10 Days",
+      "这是最贴近“原始、震撼、壮观自然景色”的方案。伦敦只留到达和返程缓冲，核心时间给爱丁堡、高地、天空岛。": "This is the route for the biggest scenery. London becomes the soft landing and departure buffer; the real weight of the trip sits with Edinburgh, Glencoe, Fort William, and Skye.",
+      "伦敦 → 爱丁堡 → Stirling → Glencoe → Fort William → Glenfinnan → Eilean Donan → Skye → Inverness → 伦敦": "London -> Edinburgh -> Stirling -> Glencoe -> Fort William -> Glenfinnan -> Eilean Donan -> Skye -> Inverness -> London",
+      "交通：伦敦到爱丁堡坐火车；爱丁堡取车，因弗内斯还车；因弗内斯回伦敦可坐白天火车或 Caledonian Sleeper。5 人租一辆 7 座车更舒服。": "Best flow: train to Edinburgh, pick up the car there, return it in Inverness, then head back to London by daytime rail or the Caledonian Sleeper. For five people, book a 7-seater if luggage is involved.",
+      "D1 伦敦": "D1 London",
+      "抵达、时差缓冲。轻松走 South Bank、Covent Garden，晚上早点休息。": "Land, keep the day gentle, and shake off the flight with South Bank and Covent Garden before an early night.",
+      "D2 伦敦 → 爱丁堡": "D2 London -> Edinburgh",
+      "上午 Tower of London 或 Churchill War Rooms；下午火车去 Edinburgh，住 Old Town / New Town。": "Use the morning for Tower of London or Churchill War Rooms, then take the afternoon train to Edinburgh. Stay in Old Town for atmosphere or New Town for easier hotels.",
+      "D3 爱丁堡": "D3 Edinburgh",
+      "D4 爱丁堡": "D4 Edinburgh",
+      "D5 爱丁堡": "D5 Edinburgh",
+      "D6 爱丁堡 → Glencoe": "D6 Edinburgh -> Glencoe",
+      "Edinburgh Castle、Royal Mile、National Museum of Scotland；体力好加 Arthur's Seat 日落。": "Give the day to Edinburgh Castle, the Royal Mile, and the National Museum of Scotland. If the weather is kind, finish with Arthur's Seat at sunset.",
+      "D4 爱丁堡 → Glencoe": "D4 Edinburgh -> Glencoe",
+      "取车，途经 Stirling Castle、Loch Lomond / Trossachs、Rannoch Moor，住 Fort William 或 Glencoe。": "Pick up the car and let the road north do the work: Stirling Castle, Loch Lomond or the Trossachs, then Rannoch Moor before Fort William or Glencoe.",
+      "Nevis Gorge 或 Glen Nevis 短徒步；下午 Glenfinnan Viaduct、Loch Shiel。Jacobite 只作可选。": "Start with a short walk in Nevis Gorge or Glen Nevis, then spend the afternoon around Glenfinnan Viaduct and Loch Shiel. Treat the Jacobite train as a bonus, not the plan's backbone.",
+      "D6 去天空岛": "D6 To Skye",
+      "Fort William → Eilean Donan Castle → Portree。傍晚 Sligachan 或 Portree 港口。": "Drive from Fort William to Portree with Eilean Donan Castle as the natural break. If there is daylight left, stop at Sligachan or the harbour.",
+      "D7 Skye 北线": "D7 North Skye",
+      "Old Man of Storr、Kilt Rock、Quiraing、Fairy Glen。最适合放一天给徒步和拍照。": "Keep this day loose for Old Man of Storr, Kilt Rock, Quiraing, and Fairy Glen. Weather and parking will decide the rhythm.",
+      "D8 Skye 西线": "D8 West Skye",
+      "Fairy Pools、Talisker Bay 或 Dunvegan Castle；天气差就改城堡/小镇。": "Use the west side for Fairy Pools, Talisker Bay, or Dunvegan Castle. If the hills disappear into rain, make it a castle-and-town day.",
+      "D9 Skye → Inverness": "D9 Skye -> Inverness",
+      "经 Loch Ness、Urquhart Castle，因弗内斯还车；晚上可坐卧铺南下或住 Inverness。": "Return toward Inverness via Loch Ness and Urquhart Castle, drop the car, then either board the sleeper south or stay one more night.",
+      "D10 回伦敦": "D10 Back to London",
+      "白天火车回伦敦或卧铺早到伦敦后补一个博物馆半日，返程。": "Take the daytime train back, or arrive early from the sleeper and use the final half-day for a London museum before flying out.",
+      "湖区徒步 + 爱丁堡 + Glencoe｜10 天": "Lake District, Edinburgh And Glencoe | 10 Days",
+      "如果你们想少一点高地长途开车，又保留高质量徒步和壮观山谷，这套更均衡。湖区很适合 5 人找 cottage 或公寓。": "A steadier route with excellent walks, fewer long Highland driving days, and enough drama from Glencoe to keep the north feeling big. The Lakes are also easier for a five-person cottage or apartment stay.",
+      "伦敦 → Lake District → 爱丁堡 → Glencoe → Fort William / Glenfinnan → Glasgow → 伦敦": "London -> Lake District -> Edinburgh -> Glencoe -> Fort William / Glenfinnan -> Glasgow -> London",
+      "交通：伦敦到 Oxenholme 可火车；湖区本地可租车 2 天；爱丁堡到高地建议租车或参加小团。": "Transport: train from London to Oxenholme; hire a car locally in the Lakes for two days; hire a car or join a small tour from Edinburgh to the Highlands.",
+      "抵达缓冲，住 King’s Cross / Euston 一带方便次日火车。": "Arrival buffer. Stay around King's Cross / Euston for the next day's train.",
+      "D2 伦敦 → 湖区": "D2 London -> Lake District",
+      "火车到 Oxenholme / Windermere，下午 Windermere 湖边、Bowness。": "Train to Oxenholme / Windermere, then Windermere lakefront and Bowness in the afternoon.",
+      "D3 湖区徒步": "D3 Lake District Hike",
+      "Catbells、Loughrigg Fell 或 Helvellyn。根据天气和队伍体力选线。": "Choose Catbells, Loughrigg Fell, or Helvellyn based on weather and group energy.",
+      "D4 湖区 → 爱丁堡": "D4 Lake District -> Edinburgh",
+      "上午 Ambleside / Grasmere；下午北上 Edinburgh。": "Ambleside or Grasmere in the morning; travel north to Edinburgh in the afternoon.",
+      "Edinburgh Castle、Royal Mile、National Museum；军事/历史兴趣者优先城堡和博物馆。": "Edinburgh Castle, Royal Mile, and the National Museum; history and military fans should prioritize the castle and museum.",
+      "取车或小团，途经 Stirling、Loch Lomond、Rannoch Moor，住 Glencoe / Fort William。": "Hire a car or join a small tour via Stirling, Loch Lomond, and Rannoch Moor. Stay in Glencoe or Fort William.",
+      "D7 Glencoe 徒步": "D7 Glencoe Hike",
+      "Three Sisters、Lost Valley 或 Glencoe Lochan。天气不好也能做短线。": "Three Sisters, Lost Valley, or Glencoe Lochan. Shorter options still work in poor weather.",
+      "D8 Glenfinnan / Mallaig": "D8 Glenfinnan / Mallaig",
+      "Glenfinnan Viaduct、Loch Shiel，或普通火车 / Jacobite 到 Mallaig。": "Glenfinnan Viaduct and Loch Shiel, or regular train / Jacobite to Mallaig.",
+      "D9 Glasgow / 伦敦": "D9 Glasgow / London",
+      "还车，Glasgow 半日城市休整；晚火车或卧铺回伦敦。": "Return the car, take a half-day breather in Glasgow, then evening train or sleeper to London.",
+      "D10 伦敦返程": "D10 London Departure",
+      "补 Imperial War Museum、Churchill War Rooms 或购物，返程。": "Add Imperial War Museum, Churchill War Rooms, or shopping before departure.",
+      "火车优先 + 约克历史线｜10 天": "Scenic Rail, York And Inverness | 10 Days",
+      "这套适合不想一路开车的人。约克给历史和博物馆，因弗内斯作为高地基地，用 Kyle Line 和一日租车/包车补足自然风光。": "The most relaxed route if the group wants to avoid constant driving. York brings the history, Inverness becomes the Highland base, and the Kyle Line adds a proper scenic rail day.",
+      "伦敦 → York → 爱丁堡 → Inverness → Kyle of Lochalsh / Plockton → Loch Ness → 伦敦": "London -> York -> Edinburgh -> Inverness -> Kyle of Lochalsh / Plockton -> Loch Ness -> London",
+      "交通：主干全火车；因弗内斯周边可租车 1-2 天。Kyle Line 单程约 2 小时 40 分，适合把“路本身”当景点。": "Transport: main legs by train; hire a car around Inverness for 1-2 days. The Kyle Line takes about 2h40m one way and makes the journey itself the attraction.",
+      "抵达缓冲，按体力安排 British Museum 或 Thames 河边散步。": "Arrival buffer. Choose the British Museum or an easy Thames walk depending on energy.",
+      "D2 伦敦 → York": "D2 London -> York",
+      "火车到 York。下午 York Minster、城墙、Shambles，住 York。": "Train to York. Spend the afternoon at York Minster, the city walls, and the Shambles. Stay in York.",
+      "D3 York → 爱丁堡": "D3 York -> Edinburgh",
+      "上午 National Railway Museum；午后火车到 Edinburgh，晚上 Calton Hill。": "National Railway Museum in the morning; train to Edinburgh after lunch, then Calton Hill in the evening.",
+      "Edinburgh Castle、Royal Mile、Holyrood Palace 或 National Museum。": "Edinburgh Castle, Royal Mile, Holyrood Palace, or the National Museum.",
+      "D5 爱丁堡 → Inverness": "D5 Edinburgh -> Inverness",
+      "火车北上，下午 Inverness 河边、Leakey's Bookshop、城堡外观。": "Train north, then Inverness riverside, Leakey's Bookshop, and the castle exterior in the afternoon.",
+      "Inverness → Plockton / Kyle of Lochalsh，沿线看 Torridon peaks、Loch Carron、Skye 海峡景色。": "Inverness -> Plockton / Kyle of Lochalsh, with Torridon peaks, Loch Carron, and the Skye strait along the way.",
+      "D7 Eilean Donan / Skye 边缘": "D7 Eilean Donan / Edge of Skye",
+      "从 Kyle 租车或包车去 Eilean Donan、Plockton、Sligachan；不深入 Skye 北线，节奏更稳。": "Hire a car or driver from Kyle for Eilean Donan, Plockton, and Sligachan. Avoid going deep into north Skye for a steadier pace.",
+      "D8 Loch Ness 历史日": "D8 Loch Ness History Day",
+      "Culloden Battlefield、Clava Cairns、Loch Ness、Urquhart Castle，晚上 Inverness。": "Culloden Battlefield, Clava Cairns, Loch Ness, and Urquhart Castle, then Inverness overnight.",
+      "D9-10 回伦敦": "D9-10 Back to London",
+      "Caledonian Sleeper 或白天火车。若多一天，伦敦安排 Imperial War Museum 或 Churchill War Rooms。": "Caledonian Sleeper or daytime train. If you have the extra day, add Imperial War Museum or Churchill War Rooms in London.",
+      "备选景点": "Alternative Places",
+      "适合天气变化、票订不到、想把路线调得更松时替换使用。": "Use these when weather shifts, tickets sell out, or the route needs more breathing room.",
+      "自然": "Nature",
+      "历史建筑": "Historic sites",
+      "博物馆": "Museums",
+      "城市": "Cities",
+      "爱丁堡到高地路上": "On the Edinburgh-Highlands road",
+      "苏格兰王权和战史核心点，适合替换 Loch Lomond 短停。": "A core site for Scottish royal and military history, useful as a substitute for a Loch Lomond stop.",
+      "历史": "History",
+      "适合对军事、城堡、苏格兰历史感兴趣的人。Plan A/B 去高地时很顺路。": "Good for military, castle, and Scottish-history interests. Convenient on Plans A and B.",
+      "低地到高地过渡": "Lowlands to Highlands transition",
+      "比 Skye 温柔，但很适合转场日休息和湖边短走。": "Gentler than Skye, but useful for a transfer-day rest and a short lochside walk.",
+      "1-3 小时": "1-3 hours",
+      "轻松": "Easy",
+      "适合从爱丁堡/格拉斯哥开往 Glencoe 的路上停，不会让当天太累。": "A good stop between Edinburgh or Glasgow and Glencoe without overloading the day.",
+      "国家公园官网": "National park website",
+      "爱丁堡到 Inverness 之间": "Between Edinburgh and Inverness",
+      "森林、山地、野生动物，比 Skye 更适合慢旅行。": "Forests, mountains, and wildlife, better than Skye for slower travel.",
+      "半天-2 天": "Half day-2 days",
+      "如果不去 Skye 又想保留高地自然，可以用 Aviemore / Cairngorms 替换一段。": "If you skip Skye but still want Highland nature, use Aviemore / Cairngorms as a replacement segment.",
+      "西海岸小镇": "West coast town",
+      "海鲜、港口、岛屿感，适合高地行程想加一点海岸气息。": "Seafood, harbour life, and island atmosphere for a Highland route that wants more coast.",
+      "小镇": "Town",
+      "如果从 Glencoe 往西海岸绕一点，Oban 比 Skye 轻松很多。": "If you detour west from Glencoe, Oban is much easier than Skye.",
+      "东海岸悬崖城堡": "East coast cliff castle",
+      "画面感非常强，但位置偏东，适合改走 Aberdeen 方向。": "Visually striking, but far east, so it fits better on an Aberdeen-facing route.",
+      "1.5-2 小时": "1.5-2 hours",
+      "城堡": "Castle",
+      "不适合硬塞进 Skye 线，但如果放弃西北高地、改东海岸，会很出彩。": "Do not force it into a Skye route, but it shines if you shift toward the east coast.",
+      "伦敦-爱丁堡铁路沿线": "On the London-Edinburgh rail line",
+      "如果不住 York，可把 Durham 当作历史建筑短停。": "If you do not stay in York, Durham works as a lighter historic stop.",
+      "铁路顺路": "Rail-friendly",
+      "适合替代 York 的轻量版本。城市小，火车站到核心区可步行或短车程。": "A lighter substitute for York. The city is compact, and the station is walkable or a short ride from the core.",
+      "Glasgow 博物馆半日": "Glasgow Museum Half-Day",
+      "返伦敦前缓冲": "Buffer before London",
+      "Kelvingrove、Riverside Museum 适合雨天和城市休整。": "Kelvingrove and Riverside Museum are good for rain and a city reset.",
+      "半天": "Half day",
+      "免费馆多": "Many free museums",
+      "Plan B 从高地回程时很好用，节奏比继续赶自然景点更舒服。": "Very useful on Plan B when returning from the Highlands; easier than chasing one more nature stop.",
+      "英格兰东北｜城堡": "Northeast England | castle",
+      "适合电影/城堡兴趣，但公共交通衔接比 York 麻烦。": "Good for film or castle interests, though public transport is less simple than York.",
+      "如果从 York / Newcastle 一带租车或包车，可以作为历史建筑备选。": "A good historic alternative if you hire a car or driver around York / Newcastle.",
+      "怎么选": "Which Route Fits Best",
+      "想要最震撼": "For Maximum Drama",
+      "选 A。Skye + Glencoe 是这三套里自然冲击力最强的组合。注意 8 月住宿和停车都要尽早处理。": "Choose A for the strongest scenery: Skye plus Glencoe is the most memorable natural pairing here. Book August lodging early and plan parking carefully.",
+      "想徒步更舒服": "For Easier Hiking Logistics",
+      "选 B。湖区徒步选择多、后勤成熟，再用 Glencoe 补高地气势。": "Choose B if the group wants strong walks with easier logistics. The Lake District gives flexibility, and Glencoe adds the Highland punch.",
+      "想少开车": "For Less Driving",
+      "选 C。高地景色用火车和短包车解决，约克让历史/博物馆需求更扎实。": "Choose C if rail comfort matters most. Let the trains carry the long distances, then use York and Inverness for history, museums, and controlled Highland day trips.",
+      "预订提醒": "Booking Notes",
+      "8 月是高峰季：": "August is peak season:",
+      "Skye、Glencoe、Fort William、湖区住宿越早越好，5 人房型更容易被订完。": "Skye, Glencoe, Fort William, and Lake District lodging should be booked early; five-person rooms go quickly.",
+      "Edinburgh 8 月有艺术节氛围：": "Edinburgh has festival energy in August:",
+      "城市会非常热闹，酒店价格和餐厅预约压力上升。": "The city will be lively, with higher hotel prices and more restaurant-booking pressure.",
+      "Jacobite 2026：": "Jacobite 2026:",
+      "官方目前显示 2026 预订和具体运行日期仍需等待确认；可以把它当加分项，不要把核心路线完全绑定在它上面。": "Official information currently shows 2026 booking and operating dates still need confirmation; treat it as a bonus, not the backbone of the route.",
+      "租车：": "Car hire:",
+      "英国左行，Skye 单车道多，建议至少两位司机；5 人加行李优先 7 座车或两辆小车。": "The UK drives on the left, and Skye has many single-track roads. Have at least two drivers; for five people plus luggage, prioritize a 7-seater or two smaller cars.",
+      "徒步：": "Hiking:",
+      "高地天气变化快，防水外套、徒步鞋、离线地图必备。Skye 的 Quiraing 和 Old Man of Storr 早出发体验明显更好。": "Highland weather changes quickly. Waterproof jackets, hiking shoes, and offline maps are essential. Quiraing and Old Man of Storr are much better early.",
+      "信息来源": "Sources",
+      "交通和景点开放信息核对于 2026-04-17：": "Transport and attraction details checked on 2026-04-17:",
+      "查看链接": "Open link"
+    };
+
+    let currentLanguage = "en";
+
+    function translateTextNode(node, lang) {
+      if (!node.i18nZh) {
+        node.i18nZh = node.nodeValue.trim();
+      }
+      const source = node.i18nZh;
+      if (!source) return;
+      const leading = node.nodeValue.match(/^\s*/)[0];
+      const trailing = node.nodeValue.match(/\s*$/)[0];
+      const translated = lang === "zh" ? source : translations[source];
+      if (translated) {
+        node.nodeValue = `${leading}${translated}${trailing}`;
+      }
+    }
+
+    function translateTree(root, lang) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach((node) => {
+        const source = node.nodeValue.trim();
+        const leading = node.nodeValue.match(/^\s*/)[0];
+        const trailing = node.nodeValue.match(/\s*$/)[0];
+        const translated = lang === "zh" ? source : translations[source];
+        if (translated) {
+          node.nodeValue = `${leading}${translated}${trailing}`;
+        }
+      });
+    }
+
+    function cachePlanLanguageHtml() {
+      document.querySelectorAll(".plan .day, .plan .route-line").forEach((element) => {
+        element.dataset.zhHtml = element.innerHTML;
+        const clone = element.cloneNode(true);
+        translateTree(clone, "en");
+        element.dataset.enHtml = clone.innerHTML;
+      });
+    }
+
+    function restorePlanLanguageHtml(lang) {
+      document.querySelectorAll(".plan .day, .plan .route-line").forEach((element) => {
+        element.innerHTML = lang === "zh" ? element.dataset.zhHtml : element.dataset.enHtml;
+      });
+    }
+
+    function applyLanguage(lang) {
+      currentLanguage = lang;
+      document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+      document.title = lang === "zh" ? "英国 8 月 10 天路线方案" : "A 10-Day UK Summer Route";
+      document.querySelectorAll("[data-lang-button]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.langButton === lang));
+      });
+
+      restorePlanLanguageHtml(lang);
+
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          const parent = node.parentElement;
+          if (!parent || ["SCRIPT", "STYLE"].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+          return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach((node) => translateTextNode(node, lang));
+      decoratePlaces();
+    }
+
+    function wireLanguageSwitch() {
+      document.querySelectorAll("[data-lang-button]").forEach((button) => {
+        button.addEventListener("click", () => {
+          applyLanguage(button.dataset.langButton);
+        });
+      });
+    }
+
+    const base = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    const attribution = "&copy; OpenStreetMap contributors";
+
+    const plans = {
+      a: {
+        element: "map-a",
+        color: "#1f5d4a",
+        className: "marker-a",
+        points: [
+          ["London", 51.5074, -0.1278],
+          ["Edinburgh", 55.9533, -3.1883],
+          ["Stirling", 56.1165, -3.9369],
+          ["Glencoe", 56.6826, -5.1023],
+          ["Fort William", 56.8198, -5.1052],
+          ["Glenfinnan", 56.8704, -5.4385],
+          ["Eilean Donan", 57.2739, -5.5161],
+          ["Portree / Skye", 57.4125, -6.1942],
+          ["Inverness", 57.4778, -4.2247],
+          ["London", 51.5074, -0.1278]
+        ]
+      },
+      b: {
+        element: "map-b",
+        color: "#b94d67",
+        className: "marker-b",
+        points: [
+          ["London", 51.5074, -0.1278],
+          ["Oxenholme", 54.3050, -2.7210],
+          ["Windermere", 54.3809, -2.9070],
+          ["Keswick", 54.6013, -3.1347],
+          ["Edinburgh", 55.9533, -3.1883],
+          ["Glencoe", 56.6826, -5.1023],
+          ["Fort William", 56.8198, -5.1052],
+          ["Glenfinnan", 56.8704, -5.4385],
+          ["Glasgow", 55.8642, -4.2518],
+          ["London", 51.5074, -0.1278]
+        ]
+      },
+      c: {
+        element: "map-c",
+        color: "#337f9e",
+        className: "marker-c",
+        points: [
+          ["London", 51.5074, -0.1278],
+          ["York", 53.9590, -1.0815],
+          ["Edinburgh", 55.9533, -3.1883],
+          ["Inverness", 57.4778, -4.2247],
+          ["Plockton", 57.3348, -5.6514],
+          ["Kyle of Lochalsh", 57.2797, -5.7138],
+          ["Eilean Donan", 57.2739, -5.5161],
+          ["Loch Ness / Urquhart", 57.3240, -4.4420],
+          ["London", 51.5074, -0.1278]
+        ]
+      }
+    };
+
+    function numberedIcon(number, className) {
+      return L.divIcon({
+        className: "numbered-marker",
+        html: `<div class="marker-dot ${className}">${number}</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -15]
+      });
+    }
+
+    function drawPlan(plan) {
+      const map = L.map(plan.element, {
+        scrollWheelZoom: false
+      });
+      L.tileLayer(base, {
+        attribution,
+        maxZoom: 18
+      }).addTo(map);
+
+      const latLngs = plan.points.map((point) => [point[1], point[2]]);
+      const line = L.polyline(latLngs, {
+        color: plan.color,
+        weight: 4,
+        opacity: 0.86
+      }).addTo(map);
+
+      if (L.polylineDecorator) {
+        L.polylineDecorator(line, {
+          patterns: [{
+            offset: "7%",
+            repeat: "15%",
+            symbol: L.Symbol.arrowHead({
+              pixelSize: 12,
+              polygon: false,
+              pathOptions: {
+                color: plan.color,
+                weight: 3,
+                opacity: 0.9
+              }
+            })
+          }]
+        }).addTo(map);
+      }
+
+      plan.points.forEach((point, index) => {
+        const label = point[0];
+        const markerNumber = index + 1;
+        L.marker([point[1], point[2]], {
+          icon: numberedIcon(markerNumber, plan.className)
+        }).addTo(map).bindPopup(`<strong>${markerNumber}. ${label}</strong>`);
+      });
+
+      map.fitBounds(line.getBounds(), {
+        padding: [28, 28]
+      });
+    }
+
+    function wireFilters() {
+      document.querySelectorAll(".filters").forEach((group) => {
+        const target = document.getElementById(group.dataset.target);
+        const buttons = group.querySelectorAll(".filter");
+        buttons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const filter = button.dataset.filter;
+            buttons.forEach((item) => item.classList.toggle("is-active", item === button));
+            if (filter !== "all") {
+              const section = target.closest(".spot-shell");
+              const expander = section.querySelector("[data-expand-target]");
+              section.classList.remove("is-collapsed");
+              if (expander) {
+                expander.setAttribute("aria-expanded", "true");
+                expander.textContent = "收起景点";
+              }
+            }
+            target.querySelectorAll(".spot-card").forEach((card) => {
+              const categories = card.dataset.category.split(" ");
+              card.hidden = filter !== "all" && !categories.includes(filter);
+            });
+          });
+        });
+      });
+    }
+
+    const placeInfo = {
+      "South Bank": {
+        title: "South Bank",
+        img: "assets/images/trip-img-37.jpg",
+        desc: "伦敦泰晤士河南岸，适合抵达当天散步、看河景和找轻松晚餐。",
+        link: "https://www.southbanklondon.com/"
+      },
+      "Covent Garden": {
+        title: "Covent Garden",
+        img: "assets/images/trip-img-10.jpg",
+        desc: "餐厅、街头表演和商店集中，适合时差日轻松逛。",
+        link: "https://www.coventgarden.london/"
+      },
+      "Tower of London": {
+        title: "Tower of London",
+        img: "assets/images/trip-img-11.jpg",
+        desc: "伦敦塔、王冠珠宝和中世纪防御建筑，历史密度很高。",
+        link: "https://www.hrp.org.uk/tower-of-london/"
+      },
+      "Churchill War Rooms": {
+        title: "Churchill War Rooms",
+        img: "assets/images/trip-img-12.jpg",
+        desc: "二战地下指挥部，适合军事和近现代史兴趣者，旺季建议提前订票。",
+        link: "https://www.iwm.org.uk/visits/churchill-war-rooms"
+      },
+      "British Museum": {
+        title: "British Museum",
+        img: "assets/images/trip-img-13.jpg",
+        desc: "免费大型博物馆，适合作为伦敦雨天或返程前半天。",
+        link: "https://www.britishmuseum.org/visit"
+      },
+      "Edinburgh Castle": {
+        title: "Edinburgh Castle",
+        img: "assets/images/trip-img-14.jpg",
+        desc: "爱丁堡制高点，城堡、炮台和苏格兰王室历史都集中在这里。",
+        link: "https://www.edinburghcastle.scot/plan-your-visit"
+      },
+      "Royal Mile": {
+        title: "Royal Mile",
+        img: "assets/images/trip-img-15.jpg",
+        desc: "爱丁堡老城主街，从城堡一路通向 Holyrood，适合串联步行。",
+        link: "https://edinburgh.org/neighbourhoods/old-town/"
+      },
+      "National Museum": {
+        title: "National Museum of Scotland",
+        img: "assets/images/trip-img-16.jpg",
+        desc: "免费、雨天友好，历史、自然史、科技展都能覆盖。",
+        link: "https://www.nms.ac.uk/national-museum-of-scotland/plan-your-visit/"
+      },
+      "Arthur's Seat": {
+        title: "Arthur's Seat",
+        img: "assets/images/trip-img-17.jpg",
+        desc: "爱丁堡城内火山丘，适合日落短徒步，风大时注意保暖。",
+        link: "https://www.historicenvironment.scot/visit-a-place/places/holyrood-park/"
+      },
+      "Stirling Castle": {
+        title: "Stirling Castle",
+        img: "assets/images/trip-img-18.jpg",
+        desc: "苏格兰王权和战争史核心点，适合爱丁堡去高地的路上停。",
+        link: "https://www.stirlingcastle.scot/plan-your-visit/"
+      },
+      "Loch Lomond": {
+        title: "Loch Lomond",
+        img: "assets/images/trip-img-19.jpg",
+        desc: "从低地进入高地前的湖区，适合转场日短暂停留。",
+        link: "https://www.lochlomond-trossachs.org/"
+      },
+      "Glencoe": {
+        title: "Glencoe",
+        img: "assets/images/trip-img-20.jpg",
+        desc: "高地山谷压迫感很强，阴天也有戏剧性，适合短徒步。",
+        link: "https://www.visitscotland.com/places-to-go/glencoe"
+      },
+      "Fort William": {
+        title: "Fort William",
+        img: "assets/images/trip-img-21.jpg",
+        desc: "西高地交通基地，可接 Ben Nevis、Glen Nevis 和 Glenfinnan。",
+        link: "https://www.visitscotland.com/places-to-go/fort-william"
+      },
+      "Glenfinnan Viaduct": {
+        title: "Glenfinnan Viaduct",
+        img: "assets/images/trip-img-22.jpg",
+        desc: "高架桥、Loch Shiel 和 Jacobite 氛围集中，停车建议早到。",
+        link: "https://www.visitscotland.com/info/towns-villages/glenfinnan-p236571"
+      },
+      "Eilean Donan Castle": {
+        title: "Eilean Donan Castle",
+        img: "assets/images/trip-img-23.jpg",
+        desc: "去 Skye 路上最经典的湖中城堡，适合转场日顺路停。",
+        link: "https://www.eileandonancastle.com/visit/"
+      },
+      "Old Man of Storr": {
+        title: "Old Man of Storr",
+        img: "assets/images/trip-img-24.jpg",
+        desc: "天空岛标志性岩柱和山脊视野，清晨体验最好。",
+        link: "https://www.visitscotland.com/info/see-do/old-man-of-storr-p2570241"
+      },
+      "Quiraing": {
+        title: "Quiraing",
+        img: "assets/images/trip-img-25.jpg",
+        desc: "Skye 北线最野的山脊地貌之一，天气好时非常震撼。",
+        link: "https://www.visitscotland.com/info/see-do/the-quiraing-p2571471"
+      },
+      "Fairy Pools": {
+        title: "Fairy Pools",
+        img: "assets/images/trip-img-26.jpg",
+        desc: "溪谷、水潭和黑色山体，徒步难度比 Quiraing 更轻。",
+        link: "https://www.isleofskye.com/skye-guide/top-ten-skye-walks/fairy-pools"
+      },
+      "Loch Ness": {
+        title: "Loch Ness",
+        img: "assets/images/trip-img-27.jpg",
+        desc: "知名度最高的苏格兰湖泊，适合和 Urquhart Castle 同日。",
+        link: "https://www.visitscotland.com/places-to-go/loch-ness"
+      },
+      "Urquhart Castle": {
+        title: "Urquhart Castle",
+        img: "assets/images/trip-img-28.jpg",
+        desc: "Loch Ness 湖边遗址，历史感和湖景结合得比较好。",
+        link: "https://www.historicenvironment.scot/visit-a-place/places/urquhart-castle"
+      },
+      "Lake District": {
+        title: "Lake District",
+        img: "assets/images/trip-img-29.jpg",
+        desc: "湖区徒步选择多、后勤成熟，适合 5 人慢一点住两晚。",
+        link: "https://www.lakedistrict.gov.uk/visiting"
+      },
+      "Windermere": {
+        title: "Windermere",
+        img: "assets/images/trip-img-30.jpg",
+        desc: "湖区交通最方便的入门点，适合抵达当天轻松走。",
+        link: "https://www.lakedistrict.gov.uk/visiting"
+      },
+      "Catbells": {
+        title: "Catbells",
+        img: "assets/images/trip-img-31.jpg",
+        desc: "湖区短线经典，投入不大但湖景回报很高。",
+        link: "https://www.lakedistrict.gov.uk/visiting/things-to-do/walking"
+      },
+      "York Minster": {
+        title: "York Minster",
+        img: "assets/images/trip-img-32.jpg",
+        desc: "哥特式大教堂、彩窗和地下遗迹，是 York 的核心历史点。",
+        link: "https://yorkminster.org/visit/"
+      },
+      "National Railway Museum": {
+        title: "National Railway Museum",
+        img: "assets/images/trip-img-33.jpg",
+        desc: "铁路、工程和工业史博物馆，适合对交通和历史技术感兴趣的人。",
+        link: "https://www.railwaymuseum.org.uk/visit"
+      },
+      "Kyle Line": {
+        title: "Kyle Line",
+        img: "assets/images/trip-img-34.jpg",
+        desc: "Inverness 到西海岸的景观铁路，适合少开车看高地。",
+        link: "https://www.scotrail.co.uk/inspiration-hub/great-scenic-rail-journeys/kyle-line-lochalsh-inverness"
+      },
+      "Culloden Battlefield": {
+        title: "Culloden Battlefield",
+        img: "assets/images/trip-img-35.jpg",
+        desc: "1746 年 Jacobite Rising 的终点，军事和历史兴趣者值得去。",
+        link: "https://www.nts.org.uk/visit/places/culloden/"
+      },
+      "Imperial War Museum": {
+        title: "Imperial War Museum",
+        img: "assets/images/trip-img-36.jpg",
+        desc: "伦敦战争史博物馆，适合返程前补军事主题。",
+        link: "https://www.iwm.org.uk/visits/iwm-london"
+      },
+      "London": {
+        title: "London",
+        img: "assets/images/trip-img-37.jpg",
+        desc: "伦敦往返的进出点，建议保留抵达缓冲和返程半天。",
+        link: "https://www.visitlondon.com/"
+      },
+      "Edinburgh": {
+        title: "Edinburgh",
+        img: "assets/images/trip-img-38.jpg",
+        desc: "苏格兰城市核心，老城、城堡、博物馆和高地交通都方便。",
+        link: "https://edinburgh.org/"
+      },
+      "Old Town": {
+        title: "Edinburgh Old Town",
+        img: "assets/images/trip-img-39.jpg",
+        desc: "爱丁堡老城，住这里方便走 Royal Mile、城堡和博物馆。",
+        link: "https://edinburgh.org/neighbourhoods/old-town/"
+      },
+      "New Town": {
+        title: "Edinburgh New Town",
+        img: "assets/images/trip-img-40.jpg",
+        desc: "爱丁堡新城，餐厅和购物方便，住宿选择通常更多。",
+        link: "https://edinburgh.org/neighbourhoods/new-town/"
+      },
+      "Holyrood Palace": {
+        title: "Palace of Holyroodhouse",
+        img: "assets/images/trip-img-41.jpg",
+        desc: "王室宫殿，适合和 Royal Mile、Arthur's Seat 串联。",
+        link: "https://www.rct.uk/visit/palace-of-holyroodhouse"
+      },
+      "Calton Hill": {
+        title: "Calton Hill",
+        img: "assets/images/trip-img-42.jpg",
+        desc: "爱丁堡市区日落点，步行成本低，视野很好。",
+        link: "https://edinburgh.org/things-to-do/activities/walking/calton-hill/"
+      },
+      "Rannoch Moor": {
+        title: "Rannoch Moor",
+        img: "assets/images/trip-img-43.jpg",
+        desc: "去 Glencoe 路上的荒原景观，阴天和雾气也很有高地感。",
+        link: "https://www.visitscotland.com/"
+      },
+      "Nevis Gorge": {
+        title: "Nevis Gorge",
+        img: "assets/images/trip-img-44.jpg",
+        desc: "Fort William 附近短徒步，可接 Steall Falls。",
+        link: "https://www.walkhighlands.co.uk/fortwilliam/steallfalls.shtml"
+      },
+      "Glen Nevis": {
+        title: "Glen Nevis",
+        img: "assets/images/trip-img-45.jpg",
+        desc: "Fort William 旁的山谷，适合安排短线徒步和瀑布。",
+        link: "https://www.visitfortwilliam.co.uk/listing/glen-nevis"
+      },
+      "Loch Shiel": {
+        title: "Loch Shiel",
+        img: "assets/images/trip-img-46.jpg",
+        desc: "Glenfinnan 旁的长湖，和高架桥、纪念碑一起看很顺。",
+        link: "https://www.visitscotland.com/info/towns-villages/glenfinnan-p236571"
+      },
+      "Portree": {
+        title: "Portree",
+        img: "assets/images/trip-img-47.jpg",
+        desc: "天空岛最大城镇，住宿、餐厅和补给最方便。",
+        link: "https://www.visitscotland.com/places-to-go/isle-skye/portree"
+      },
+      "Sligachan": {
+        title: "Sligachan",
+        img: "assets/images/trip-img-48.jpg",
+        desc: "Cuillin 山脚经典视角，适合傍晚短停拍照。",
+        link: "https://www.isleofskye.com/skye-guide/top-ten-skye-walks/sligachan"
+      },
+      "Kilt Rock": {
+        title: "Kilt Rock",
+        img: "assets/images/trip-img-49.jpg",
+        desc: "Skye 东北海岸悬崖瀑布，通常和 Storr、Quiraing 同线。",
+        link: "https://www.isleofskye.com/skye-guide/top-ten-skye-walks/kilt-rock-and-mealt-falls"
+      },
+      "Fairy Glen": {
+        title: "Fairy Glen",
+        img: "assets/images/trip-img-50.jpg",
+        desc: "Skye 北部小型奇异地貌，适合短停，不适合压缩主线徒步时间。",
+        link: "https://www.isleofskye.com/skye-guide/top-ten-skye-walks/fairy-glen"
+      },
+      "Talisker Bay": {
+        title: "Talisker Bay",
+        img: "assets/images/trip-img-51.jpg",
+        desc: "Skye 西侧海滩，适合替代天气不佳时的长徒步。",
+        link: "https://www.isleofskye.com/skye-guide/top-ten-skye-walks/talisker-bay"
+      },
+      "Dunvegan Castle": {
+        title: "Dunvegan Castle",
+        img: "assets/images/trip-img-52.jpg",
+        desc: "Skye 西北部城堡，适合雨天或想少徒步时替换。",
+        link: "https://www.dunvegancastle.com/"
+      },
+      "Inverness": {
+        title: "Inverness",
+        img: "assets/images/trip-img-53.jpg",
+        desc: "北高地交通基地，适合接 Loch Ness、Culloden 和 Kyle Line。",
+        link: "https://www.visitscotland.com/places-to-go/inverness"
+      },
+      "York": {
+        title: "York",
+        img: "assets/images/trip-img-54.jpg",
+        desc: "伦敦到爱丁堡铁路线上非常适合停一晚的历史城市。",
+        link: "https://www.visityork.org/"
+      },
+      "Shambles": {
+        title: "The Shambles",
+        img: "assets/images/trip-img-55.jpg",
+        desc: "York 老街区，适合和 York Minster、城墙同日步行。",
+        link: "https://www.visityork.org/business-directory/shambles"
+      },
+      "Thames": {
+        title: "River Thames",
+        img: "assets/images/trip-img-56.jpg",
+        desc: "抵达当天最轻松的伦敦散步线，适合不消耗体力。",
+        link: "https://www.visitlondon.com/things-to-do/sightseeing/london-attraction/river-thames"
+      },
+      "Ambleside": {
+        title: "Ambleside",
+        img: "assets/images/trip-img-57.jpg",
+        desc: "湖区小镇，餐厅和徒步起点都方便。",
+        link: "https://www.lakedistrict.gov.uk/visiting"
+      },
+      "Grasmere": {
+        title: "Grasmere",
+        img: "assets/images/trip-img-58.jpg",
+        desc: "湖区村庄，节奏比 Windermere 更安静，适合半天闲逛。",
+        link: "https://www.lakedistrict.gov.uk/visiting"
+      },
+      "Helvellyn": {
+        title: "Helvellyn",
+        img: "assets/images/trip-img-59.jpg",
+        desc: "湖区强度更高的山线，天气和体力都合适时再选。",
+        link: "https://www.lakedistrict.gov.uk/visiting/things-to-do/walking"
+      },
+      "Loughrigg Fell": {
+        title: "Loughrigg Fell",
+        img: "assets/images/trip-img-60.jpg",
+        desc: "湖区中低强度徒步，适合天气一般或想轻松一点的队伍。",
+        link: "https://www.lakedistrict.gov.uk/visiting/things-to-do/walking"
+      },
+      "Three Sisters": {
+        title: "Three Sisters",
+        img: "assets/images/trip-img-61.jpg",
+        desc: "Glencoe 最经典的山谷视角，停车点容易满。",
+        link: "https://www.visitscotland.com/places-to-go/glencoe"
+      },
+      "Lost Valley": {
+        title: "Lost Valley",
+        img: "assets/images/trip-img-62.jpg",
+        desc: "Glencoe 经典徒步线，比普通观景点更有参与感。",
+        link: "https://www.walkhighlands.co.uk/fortwilliam/lostvalley.shtml"
+      },
+      "Glencoe Lochan": {
+        title: "Glencoe Lochan",
+        img: "assets/images/trip-img-63.jpg",
+        desc: "天气不好时也能做的短线，湖边和林地更轻松。",
+        link: "https://www.walkhighlands.co.uk/fortwilliam/glencoelochan.shtml"
+      },
+      "Mallaig": {
+        title: "Mallaig",
+        img: "assets/images/trip-img-64.jpg",
+        desc: "西海岸港口，可用普通火车或 Jacobite 从 Fort William 抵达。",
+        link: "https://www.visitscotland.com/places-to-go/mallaig"
+      },
+      "Glasgow": {
+        title: "Glasgow",
+        img: "assets/images/trip-img-65.jpg",
+        desc: "适合高地回程前休整，博物馆和餐厅选择多。",
+        link: "https://peoplemakeglasgow.com/"
+      },
+      "Plockton": {
+        title: "Plockton",
+        img: "assets/images/trip-img-66.jpg",
+        desc: "Kyle Line 沿线小海湾村庄，比纯当天往返更松弛。",
+        link: "https://www.visitscotland.com/places-to-go/plockton"
+      },
+      "Kyle of Lochalsh": {
+        title: "Kyle of Lochalsh",
+        img: "assets/images/trip-img-67.jpg",
+        desc: "Kyle Line 终点，靠近 Skye 桥和 Eilean Donan。",
+        link: "https://www.visitscotland.com/"
+      },
+      "Clava Cairns": {
+        title: "Clava Cairns",
+        img: "assets/images/trip-img-68.jpg",
+        desc: "Inverness 附近史前石冢，适合和 Culloden 同线。",
+        link: "https://www.historicenvironment.scot/visit-a-place/places/clava-cairns/"
+      },
+      "Bowness": {
+        title: "Bowness-on-Windermere",
+        img: "assets/images/trip-img-69.jpg",
+        desc: "Windermere 湖边小镇，抵达湖区当天很适合轻松走。",
+        link: "https://www.lakedistrict.gov.uk/visiting"
+      }
+    };
+
+    function decoratePlaces() {
+      const names = Object.keys(placeInfo).sort((a, b) => b.length - a.length);
+      const escaped = names.map((name) => name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      const pattern = new RegExp(`(?<![A-Za-z])(${escaped.join("|")})(?![A-Za-z])`, "g");
+      const areas = document.querySelectorAll(".plan .day, .plan .route-line");
+
+      areas.forEach((area) => {
+        const walker = document.createTreeWalker(area, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+
+        nodes.forEach((node) => {
+          if (!pattern.test(node.nodeValue)) return;
+          pattern.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          node.nodeValue.replace(pattern, (match, _name, offset) => {
+            fragment.append(document.createTextNode(node.nodeValue.slice(lastIndex, offset)));
+            const info = placeInfo[match];
+            const span = document.createElement("span");
+            span.className = "place-pop";
+            span.tabIndex = 0;
+            const linkLabel = currentLanguage === "zh" ? "查看链接" : translations["查看链接"];
+            const desc = currentLanguage === "zh" ? info.desc : englishPlaceDescription(info);
+            span.innerHTML = `${match}<span class="info-dot">i</span><span class="mini-card"><img src="${info.img}" alt="${info.title}"><span class="mini-card-body"><b>${info.title}</b><p>${desc}</p><a href="${info.link}" target="_blank" rel="noreferrer">${linkLabel}</a></span></span>`;
+            fragment.append(span);
+            lastIndex = offset + match.length;
+          });
+          fragment.append(document.createTextNode(node.nodeValue.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+      });
+    }
+
+    function wireDetailsAutoClose() {
+      document.querySelectorAll(".spot-card").forEach((card) => {
+        card.addEventListener("mouseleave", () => {
+          card.open = false;
+        });
+      });
+    }
+
+    function wireExpandableSections() {
+      document.querySelectorAll("[data-expand-target]").forEach((button) => {
+        const section = document.getElementById(button.dataset.expandTarget);
+        button.addEventListener("click", () => {
+          const isCollapsed = section.classList.toggle("is-collapsed");
+          button.setAttribute("aria-expanded", String(!isCollapsed));
+          const label = isCollapsed ? "展开全部景点" : "收起景点";
+          button.textContent = currentLanguage === "zh" ? label : translations[label];
+        });
+      });
+    }
+
+    function englishPlaceDescription(info) {
+      const descriptions = {
+        "South Bank": "An easy first-evening walk along the Thames, with river views and relaxed dinner options.",
+        "Covent Garden": "A low-effort London stop for food, shops, and street life when everyone is still adjusting.",
+        "Tower of London": "A dense London history stop with medieval walls, crown jewels, and fortress atmosphere.",
+        "Churchill War Rooms": "A strong London choice for wartime history, especially if the group wants something focused and indoors.",
+        "British Museum": "A flexible, free museum option for rain, jet lag, or a final half-day in London.",
+        "Edinburgh Castle": "The city's heavyweight historic site, with military history, royal rooms, and the best natural vantage point in town.",
+        "Royal Mile": "The Old Town spine between the castle and Holyrood, best explored slowly on foot.",
+        "National Museum of Scotland": "A generous, free museum that works beautifully as a weather-proof Edinburgh buffer.",
+        "Arthur's Seat": "A short volcanic hill walk inside the city, best saved for sunset if the wind behaves.",
+        "Stirling Castle": "A useful stop between Edinburgh and the Highlands, with royal history and a strong defensive setting.",
+        "Loch Lomond": "A gentler loch stop before the Highlands, useful when the drive needs a scenic pause.",
+        "Glencoe": "One of the route's most dramatic landscapes, with moody valleys, short walks, and big Highland scale.",
+        "Fort William": "A practical west Highland base for Ben Nevis, Glen Nevis, Glenfinnan, and rail connections.",
+        "Glenfinnan": "A compact scenic stop for the viaduct, Loch Shiel, railway nostalgia, and Jacobite history.",
+        "Eilean Donan Castle": "The classic castle-on-the-water moment between Fort William and Skye.",
+        "Old Man of Storr": "Skye's landmark walk, with jagged rock forms and huge views when the cloud lifts.",
+        "Quiraing": "A wild north Skye landscape of ridges, slopes, sea views, and constantly changing light.",
+        "Fairy Pools": "A lighter Skye walk through clear pools and dark mountain scenery.",
+        "Loch Ness": "A famous and easy Inverness-side stop, best paired with Urquhart Castle.",
+        "Urquhart Castle": "Ruined castle walls above Loch Ness, good for a history stop that still feels scenic.",
+        "Lake District": "A reliable walking region with easier logistics and more weather options than Skye.",
+        "Windermere": "The simplest Lake District arrival point, good for a gentle first afternoon by the water.",
+        "Catbells": "A short classic Lake District walk with a high reward-to-effort ratio.",
+        "York Minster": "York's main historic set piece, with Gothic architecture, glass, and layered city history.",
+        "National Railway Museum": "A strong free museum for rail, engineering, transport, and industrial history.",
+        "Kyle Line": "A scenic railway from Inverness toward the west coast, ideal when the group wants Highland views without a long drive.",
+        "Culloden Battlefield": "A sober and worthwhile battlefield stop for Jacobite and military history.",
+        "Imperial War Museum": "A London museum option for military history before departure.",
+        "London": "The arrival and departure base, best kept light so the trip has room for the north.",
+        "Edinburgh": "The natural Scottish city base, with Old Town walks, castle history, museums, and easy Highland onward travel.",
+        "Old Town": "The most atmospheric Edinburgh base for walking to the Royal Mile, castle, and museums.",
+        "New Town": "A calmer Edinburgh base with restaurants, shopping, and a broader hotel mix.",
+        "Palace of Holyroodhouse": "A royal residence that pairs naturally with the Royal Mile and Arthur's Seat.",
+        "Calton Hill": "A low-effort Edinburgh viewpoint that is especially good near sunset.",
+        "Rannoch Moor": "A lonely moorland landscape on the way to Glencoe, at its best in mist or low cloud.",
+        "Nevis Gorge": "A short Fort William walk that can connect to Steall Falls.",
+        "Glen Nevis": "A mountain valley beside Fort William, useful for shorter walks and waterfall scenery.",
+        "Loch Shiel": "The long loch beside Glenfinnan, easy to combine with the viaduct and monument.",
+        "Portree": "Skye's most practical town for lodging, restaurants, fuel, and supplies.",
+        "Sligachan": "A classic Cuillin viewpoint, especially useful as a short evening photo stop.",
+        "Kilt Rock": "A north-east Skye cliff and waterfall stop that fits naturally with Storr and Quiraing.",
+        "Fairy Glen": "A small, strange north Skye landscape for a quick stop rather than a main hike.",
+        "Talisker Bay": "A west Skye beach option that works well when longer hikes are not appealing.",
+        "Dunvegan Castle": "A west Skye castle choice for rain or a lower-walking day.",
+        "Inverness": "A practical northern base for Loch Ness, Culloden, and the Kyle Line.",
+        "York": "A historic rail-line city that earns an overnight stop between London and Edinburgh.",
+        "The Shambles": "York's most famous old street, best paired with York Minster and the city walls.",
+        "River Thames": "The easiest London walk on an arrival day, with views and very little planning needed.",
+        "Ambleside": "A Lake District town with food, lodging, and convenient walking starts.",
+        "Grasmere": "A quieter Lake District village that works well for a slow half-day.",
+        "Helvellyn": "A bigger Lake District mountain day, best saved for good weather and a strong group.",
+        "Loughrigg Fell": "A gentler Lake District walk with strong views and flexible timing.",
+        "Three Sisters": "The iconic Glencoe viewpoint, dramatic and busy in peak season.",
+        "Lost Valley": "A classic Glencoe walk that feels more immersive than a viewpoint stop.",
+        "Glencoe Lochan": "A shorter loch-and-woodland walk for mixed weather or a lighter day.",
+        "Mallaig": "A west coast harbour that can be reached from Fort William by regular rail or the Jacobite.",
+        "Glasgow": "A useful reset before returning south, with strong museums and plenty of food options.",
+        "Plockton": "A small west coast village on the Kyle Line, more relaxed than a pure day return.",
+        "Kyle of Lochalsh": "The end of the Kyle Line, close to the Skye bridge and Eilean Donan.",
+        "Clava Cairns": "A prehistoric site near Inverness, easy to pair with Culloden.",
+        "Bowness-on-Windermere": "A lakeside town that works well on the Lake District arrival day."
+      };
+      return descriptions[info.title] || `${info.title} is a useful route stop when the day's timing and weather line up.`;
+    }
+
+    const spotlight = document.getElementById("spotlight");
+    const alternatives = document.getElementById("alternatives");
+    alternatives.parentNode.insertBefore(spotlight, alternatives);
+
+    wireHeroCarousel();
+    Object.values(plans).forEach(drawPlan);
+    wireFilters();
+    wireLanguageSwitch();
+    wireDetailsAutoClose();
+    wireExpandableSections();
+    cachePlanLanguageHtml();
+    applyLanguage("en");
+  </script>
+</body>
+</html>
+
+
+
+
