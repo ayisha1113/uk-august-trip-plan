@@ -453,10 +453,11 @@
       pointer-events: none;
     }
 
-    .spot-card:hover .spot-hover,
-    .spot-card:focus-within .spot-hover {
-      opacity: 1;
-      transform: translateY(0);
+    @media (hover: hover) and (pointer: fine) {
+      .spot-card:hover:not([open]) .spot-hover {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .spot-body {
@@ -531,8 +532,17 @@
       min-height: 112px;
     }
 
-    .place-pop:hover .mini-card,
-    .place-pop:focus-within .mini-card {
+    @media (hover: hover) and (pointer: fine) {
+      .place-pop:hover .mini-card,
+      .place-pop:focus-within .mini-card {
+        opacity: 1;
+        transform: translate(-50%, 0);
+        pointer-events: auto;
+        display: grid;
+      }
+    }
+
+    .place-pop.is-active .mini-card {
       opacity: 1;
       transform: translate(-50%, 0);
       pointer-events: auto;
@@ -650,8 +660,12 @@
 
       .hero {
         min-height: 72vh;
-        padding: 30px 16px;
+        padding: 30px 16px 72px;
         width: 100%;
+      }
+
+      .hero-dots {
+        bottom: 20px;
       }
 
       main {
@@ -699,19 +713,16 @@
       }
 
       .mini-card {
-        position: fixed;
-        left: 12px;
+        left: 0;
         right: auto;
-        top: 12px;
-        bottom: auto;
-        width: calc(100vw - 24px);
-        max-width: 360px;
+        bottom: calc(100% + 8px);
+        width: min(340px, calc(100vw - 32px));
+        max-width: none;
         grid-template-columns: 96px minmax(0, 1fr);
         transform: translateY(8px);
       }
 
-      .place-pop:hover .mini-card,
-      .place-pop:focus-within .mini-card {
+      .place-pop.is-active .mini-card {
         transform: translateY(0);
       }
 
@@ -2054,6 +2065,8 @@
             const span = document.createElement("span");
             span.className = "place-pop";
             span.tabIndex = 0;
+            span.setAttribute("role", "button");
+            span.setAttribute("aria-expanded", "false");
             const linkLabel = currentLanguage === "zh" ? "查看链接" : translations["查看链接"];
             const desc = currentLanguage === "zh" ? info.desc : englishPlaceDescription(info);
             span.innerHTML = `${match}<span class="info-dot">i</span><span class="mini-card"><img src="${info.img}" alt="${info.title}"><span class="mini-card-body"><b>${info.title}</b><p>${desc}</p><a href="${info.link}" target="_blank" rel="noreferrer">${linkLabel}</a></span></span>`;
@@ -2072,6 +2085,62 @@
           card.open = false;
         });
       });
+    }
+
+    function closePlacePopovers() {
+      document.querySelectorAll(".place-pop.is-active").forEach((popover) => {
+        popover.classList.remove("is-active");
+        popover.setAttribute("aria-expanded", "false");
+        const card = popover.querySelector(".mini-card");
+        if (card) card.style.marginLeft = "";
+      });
+    }
+
+    function keepMiniCardInViewport(popover) {
+      const card = popover.querySelector(".mini-card");
+      if (!card) return;
+      card.style.marginLeft = "";
+      const rect = card.getBoundingClientRect();
+      const gutter = 12;
+      if (rect.right > window.innerWidth - gutter) {
+        card.style.marginLeft = `${window.innerWidth - gutter - rect.right}px`;
+      } else if (rect.left < gutter) {
+        card.style.marginLeft = `${gutter - rect.left}px`;
+      }
+    }
+
+    function wirePlacePopovers() {
+      document.addEventListener("click", (event) => {
+        const popover = event.target.closest(".place-pop");
+        if (!popover) {
+          closePlacePopovers();
+          return;
+        }
+        if (event.target.closest(".mini-card a")) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const shouldOpen = !popover.classList.contains("is-active");
+        closePlacePopovers();
+        if (shouldOpen) {
+          popover.classList.add("is-active");
+          popover.setAttribute("aria-expanded", "true");
+          requestAnimationFrame(() => keepMiniCardInViewport(popover));
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const popover = event.target.closest(".place-pop");
+        if (!popover) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          popover.click();
+        } else if (event.key === "Escape") {
+          closePlacePopovers();
+        }
+      });
+
+      window.addEventListener("scroll", closePlacePopovers, { passive: true });
+      window.addEventListener("resize", closePlacePopovers);
     }
 
     function wireExpandableSections() {
@@ -2162,6 +2231,7 @@
     wireFilters();
     wireLanguageSwitch();
     wireDetailsAutoClose();
+    wirePlacePopovers();
     wireExpandableSections();
     cachePlanLanguageHtml();
     applyLanguage("en");
