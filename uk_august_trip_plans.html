@@ -72,10 +72,15 @@
         linear-gradient(90deg, rgba(8, 18, 15, 0.48), rgba(8, 18, 15, 0.08) 62%);
     }
 
-    .hero-slide {
+    .hero-slides {
       position: absolute;
       inset: 0;
       z-index: -2;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
       background-position: center;
       background-size: cover;
       opacity: 0;
@@ -756,8 +761,8 @@
   <header class="hero">
     <div class="hero-slides" data-hero-slides aria-hidden="true"></div>
     <div class="language-switch" aria-label="Language">
-      <button type="button" data-lang-button="en" aria-pressed="false">EN</button>
-      <button type="button" data-lang-button="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-button="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang-button="zh" aria-pressed="false">中文</button>
     </div>
     <div class="hero-inner">
       <h1>8 月去英国，往北走到天空岛</h1>
@@ -1176,6 +1181,7 @@
 
     let currentHeroSlide = 0;
     let heroTimer = null;
+    let heroTouchStartX = 0;
 
     function setHeroSlide(index) {
       currentHeroSlide = index;
@@ -1199,6 +1205,16 @@
       }, 6000);
     }
 
+    function stopHeroAutoplay() {
+      clearInterval(heroTimer);
+      heroTimer = null;
+    }
+
+    function moveHeroSlide(step) {
+      setHeroSlide((currentHeroSlide + step + heroSlides.length) % heroSlides.length);
+      startHeroAutoplay();
+    }
+
     function wireHeroCarousel() {
       const slideRoot = document.querySelector("[data-hero-slides]");
       const dotRoot = document.querySelector("[data-hero-dots]");
@@ -1215,11 +1231,30 @@
         dot.dataset.heroDot = String(index);
         dot.setAttribute("aria-label", `Show hero image ${index + 1}: ${item.label}`);
         dot.addEventListener("click", () => {
-          setHeroSlide(index);
-          startHeroAutoplay();
+          moveHeroSlide(index - currentHeroSlide);
         });
         dotRoot.appendChild(dot);
       });
+
+      const hero = document.querySelector(".hero");
+      hero.addEventListener("touchstart", (event) => {
+        heroTouchStartX = event.touches[0].clientX;
+      }, { passive: true });
+      hero.addEventListener("touchend", (event) => {
+        const distance = event.changedTouches[0].clientX - heroTouchStartX;
+        if (Math.abs(distance) < 42) return;
+        moveHeroSlide(distance < 0 ? 1 : -1);
+      }, { passive: true });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopHeroAutoplay();
+        } else {
+          startHeroAutoplay();
+        }
+      });
+      window.addEventListener("pageshow", startHeroAutoplay);
+
       setHeroSlide(0);
       startHeroAutoplay();
     }
@@ -2445,7 +2480,7 @@
     wirePlacePopovers();
     wireExpandableSections();
     cachePlanLanguageHtml();
-    applyLanguage("zh");
+    applyLanguage("en");
   </script>
 </body>
 </html>
